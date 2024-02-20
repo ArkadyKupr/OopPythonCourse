@@ -142,29 +142,23 @@ class Circle(Shape):
         return 2 * math.pi * self.__radius
 
 
-square = Square(5)
-print("Длина квадрата:", square.get_width())
-print("Высота квадрата:", square.get_height())
-print("Площадь квадрата:", square.get_area())
-print("Периметр квадрата:", square.get_perimeter())
-print()
+shapes = [Circle(10), Rectangle(5, 10), Triangle(5, 9, 0, 8, 7, 13), Square(5), Square(15)]
 
-triangle = Triangle(5, 9, 0, 8, 7, 13)
-print("Длина треугольника:", triangle.get_width())
-print("Высота треугольника:", triangle.get_height())
-print("Площадь треугольника:", triangle.get_area())
-print("Периметр треугольника:", triangle.get_perimeter())
-print()
+area = []
 
-rectangle = Rectangle(5, 10)
-print("Длина прямоугольника:", rectangle.get_width())
-print("Высота прямоугольника:", rectangle.get_height())
-print("Площадь прямоугольника:", rectangle.get_area())
-print("Периметр прямоугольника:", rectangle.get_perimeter())
-print()
+for s in shapes:
+    area.append((s.get_area(), s))
 
-circle = Circle(10)
-print("Длина круга:", circle.get_width())
-print("Высота круга:", circle.get_height())
-print("Площадь круга:", circle.get_area())
-print("Длина окружности:", circle.get_perimeter())
+print(area)
+
+def get_shape_area(item):
+         return item.get_area()
+
+
+def get_shape_perimeter(item):
+    return item.get_perimeter()
+
+
+print(sorted(shapes, key=get_shape_area)[len(shapes) - 1])
+
+print(sorted(shapes, key=get_shape_perimeter)[len(shapes) - 2])
