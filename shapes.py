@@ -39,11 +39,16 @@ class Square(Shape):
     def __repr__(self):
         return f"Square({self.__side_length})"
 
-    def __len__(self):
-        return len(self.__side_length)
 
     def __hash__(self):
         return hash((self.__side_length))
+
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+
+        return self.__side_length == other.__side_length
 
 
 class Triangle(Shape):
@@ -79,6 +84,7 @@ class Triangle(Shape):
 
         return triangle_area
 
+
     def get_perimeter(self):
         EPSILON = 1.0e-10
 
@@ -96,11 +102,15 @@ class Triangle(Shape):
     def __repr__(self):
         return f"Triangle(({self.__x_1}, {self.__y_1}); ({self.__x_2}, {self.__y_2}); ({self.__x_3}, {self.__y_3})"
 
-    def __len__(self):
-        return abs(self.__x_1)
-
     def __hash__(self):
         return hash((self.__x_1, self.__y_1, self.__x_2, self.__y_2, self.__x_3, self.__y_3))
+
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+
+        return self.__x_1 == other.__x_1 and self.__y_1 == other.__y_1 and self.__x_2 == other.__x_2 and self.__y_2 == other.__y_2 and self.__x_3 == other.__x_3 and self.__y_3 == other.__y_3
 
 
 class Rectangle(Shape):
@@ -126,12 +136,16 @@ class Rectangle(Shape):
     def __repr__(self):
         return f"Rectangle({self.__rectangle_width}, {self.__rectangle_length})"
 
-    def __len__(self):
-        return self.__rectangle_width
-
 
     def __hash__(self):
         return hash((self.__rectangle_width, self.__rectangle_length))
+
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+
+        return self.__rectangle_width == other.__rectangle_width and self.__rectangle_length == other.__rectangle_length
 
 
 class Circle(Shape):
@@ -156,12 +170,16 @@ class Circle(Shape):
     def __repr__(self):
         return f"Circle({self.__radius})"
 
-    def __len__(self):
-        return self.__radius
-
 
     def __hash__(self):
         return hash((self.__radius))
+
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+
+        return self.__radius == other.__radius
 
 
 shapes = [Circle(10), Rectangle(5, 10), Triangle(5, 9, 0, 8, 7, 13), Square(5), Square(15)]
