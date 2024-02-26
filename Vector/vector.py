@@ -1,3 +1,6 @@
+from multipledispatch import dispatch
+
+
 class Vector:
     @dispatch(int)
     def __init__(self, n):
