@@ -1,8 +1,10 @@
+import math
 from multipledispatch import dispatch
 import copy
 
 
 class Vector:
+    # 1. а) размерность n, все компонены равны нулю
     @dispatch(int)
     def __init__(self, n):
         if n <= 0:
@@ -12,6 +14,18 @@ class Vector:
             self.__n = n
             self.__vector = n * [0]
 
+    # 1. b) конструктор копирования
+    @dispatch(list)
+    def __init__(self, vector):
+        self.__vector = vector
+
+    # 1. с) заполнение вектора значениями из списка чисел
+    # @dispatch(list)
+    # def __init__(self, components):
+    # self.__components = components.copy()
+
+    # 1. d) заполнение вектора значениями из списка чисел.
+    # Если длина списка меньше n, то считать, что в остальных компонентах 0.
     @dispatch(int, list)
     def __init__(self, n, components):
         if n <= 0:
@@ -26,20 +40,23 @@ class Vector:
             components.append(0)
             length += 1
 
-        self.__vector = components
+        self.__components = components
 
-    @dispatch(list)
-    def __init__(self, vector):
-        self.__vector = vector.copy()
-
-    @dispatch(list)
-    def __init__(self, vector):
-        self.__vector = copy.copy(vector)
+    # 2. Свойства для получения размерности вектора и длины вектора
+    @property
+    def vector_dimension(self):
+        return len(self.__vector)
 
     @property
     def vector_length(self):
-        return len(self.__vector)
+        current_vector_length = 0
+        for e in self.__vector:
+            current_vector_length += e * e
 
+        return math.sqrt(current_vector_length)
+
+    # 3. Реализовать метод __repr__, чтобы выдавал информацию о векторе в формате (значения компонент через запятую)
+    # Например, {1, 2, 3}
     def __repr__(self):
         list_length = len(self.__vector)
 
@@ -55,113 +72,194 @@ class Vector:
 
         return f"{numbers_string}"
 
+    # g. Переопределить метод __eq__, чтобы было True - векторы имеют одинаковую размерность и соответствующие компоненты
+    # равны
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
 
-def get_sum_vector(vector_1, vector_2):
-    vector_1_length = len(vector_1)
-    vector_2_length = len(vector_2)
+        return len(self.__vector) == len(other.__vector) and self.__vector == other.__vector
 
-    if vector_1_length >= vector_2_length:
-        for i, value_1 in enumerate(vector_1):
-            value_1 = vector_1[i]
+    def __hash__(self):
+        return hash((self.__n, self.__vector))
 
-            if i < vector_2_length:
+    # 4. Реализовать операторы:
+    # a. Прибавление к вектору другого вектора
+    def get_sum_vector(self, other):
+        vector_1_length = len(self.__vector)
+        vector_2_length = len(other.__vector)
 
-                for j, value_2 in enumerate(vector_2):
-                    if i == j:
-                        value_2 = vector_2[j]
-                        value_1 += value_2
-                        vector_1[i] = value_1
+        if vector_1_length > vector_2_length:
+            length_difference = vector_1_length - vector_2_length
 
-    else:
-        length_difference = vector_2_length - vector_1_length
+            for i in range(length_difference):
+                other.__vector.append(0)
+        else:
+            length_difference = vector_2_length - vector_1_length
 
-        for i in range(length_difference):
-            vector_1.append(0)
+            for i in range(length_difference):
+                self.__vector.append(0)
 
-        for i, value_1 in enumerate(vector_1):
-            value_1 = vector_1[i]
+        for i, number_1 in enumerate(self.__vector):
+            number_1 = self.__vector[i]
 
-            for j, value_2 in enumerate(vector_2):
+            for j, number_2 in enumerate(other.__vector):
                 if i == j:
-                    value_1 += vector_2[j]
-                    vector_1[i] = value_1
+                    number_2 = other.__vector[i]
+                    number_1 += number_2
+                    self.__vector[i] = number_1
 
-    return vector_1
+        return self.__vector
 
+    # b. Вычитание из вектора другого вектора
+    def get_diff_vector(self, other):
+        vector_1_length = len(self.__vector)
+        vector_2_length = len(other.__vector)
 
-def get_diff_vector(vector_1, vector_2):
-    vector_1_length = len(vector_1)
-    vector_2_length = len(vector_2)
+        if vector_1_length > vector_2_length:
+            length_difference = vector_1_length - vector_2_length
 
-    if vector_1_length >= vector_2_length:
-        for i, value_1 in enumerate(vector_1):
-            value_1 = vector_1[i]
+            for i in range(length_difference):
+                other.__vector.append(0)
+        else:
+            length_difference = vector_2_length - vector_1_length
 
-            if i < vector_2_length:
+            for i in range(length_difference):
+                self.__vector.append(0)
 
-                for j, value_2 in enumerate(vector_2):
-                    if i == j:
-                        value_2 = vector_2[j]
-                        value_1 -= value_2
-                        vector_1[i] = value_1
+        for i, number_1 in enumerate(self.__vector):
+            number_1 = self.__vector[i]
 
-    else:
-        length_difference = vector_2_length - vector_1_length
-
-        for i in range(length_difference):
-            vector_1.append(0)
-
-        for i, value_1 in enumerate(vector_1):
-            value_1 = vector_1[i]
-
-            for j, value_2 in enumerate(vector_2):
+            for j, number_2 in enumerate(other.__vector):
                 if i == j:
-                    value_1 -= vector_2[j]
-                    vector_1[i] = value_1
+                    number_2 = other.__vector[i]
+                    self.__vector[i] = number_1 - number_2
 
-    return vector_1
+        return self.__vector
 
+    # с. Сложение двух векторов - должен создаваться новый вектор
+    def get_sum_new_vector(self, other):
+        vector_1_length = len(self.__vector)
+        vector_2_length = len(other.__vector)
 
-def get_sum_new_vector(vector_1, vector_2):
-    vector_1_length = len(vector_1)
-    vector_2_length = len(vector_2)
+        max_length = vector_1_length if vector_1_length > vector_2_length else vector_2_length
 
-    max_length = vector_1_length if vector_1_length > vector_2_length else vector_2_length
+        sum_vector = []
+        for i in range(max_length):
+            sum_vector.append(0)
 
-    sum_vector = []
-    for i in range(max_length):
-        sum_vector.append(0)
+        if vector_1_length > vector_2_length:
+            length_difference = vector_1_length - vector_2_length
 
-    if vector_1_length > vector_2_length:
-        length_difference = vector_1_length - vector_2_length
+            for i in range(length_difference):
+                other.__vector.append(0)
+        else:
+            length_difference = vector_2_length - vector_1_length
 
-        for i in range(length_difference):
-            vector_2.append(0)
-    else:
-        length_difference = vector_2_length - vector_1_length
+            for i in range(length_difference):
+                self.__vector.append(0)
 
-        for i in range(length_difference):
-            vector_1.append(0)
+        for i, sum_number in enumerate(sum_vector):
 
-    for i, sum_value in enumerate(sum_vector):
+            for j, number_1 in enumerate(self.__vector):
+                number_1 = self.__vector[j]
 
-        for j, value_1 in enumerate(vector_1):
-            value_1 = vector_1[j]
+                for k, number_2 in enumerate(other.__vector):
+                    number_2 = other.__vector[k]
 
-            for k, value_2 in enumerate(vector_2):
-                value_2 = vector_2[k]
+                    if i == j and j == k:
+                        sum_vector[k] = number_1 + number_2
 
-                if i == j and j == k:
-                    sum_vector[i] = value_1 + value_2
+        return sum_vector
 
-    return sum_vector
+    # d. Вычитание векторов - должен создаваться новый вектор
+    def get_difference_new_vector(self, other):
+        vector_1_length = len(self.__vector)
+        vector_2_length = len(other.__vector)
+
+        max_length = vector_1_length if vector_1_length > vector_2_length else vector_2_length
+
+        difference_vector = []
+        for i in range(max_length):
+            difference_vector.append(0)
+
+        if vector_1_length > vector_2_length:
+            length_difference = vector_1_length - vector_2_length
+
+            for i in range(length_difference):
+                other.__vector.append(0)
+        else:
+            length_difference = vector_2_length - vector_1_length
+
+            for i in range(length_difference):
+                self.__vector.append(0)
+
+        for i, sum_number in enumerate(difference_vector):
+
+            for j, number_1 in enumerate(self.__vector):
+                number_1 = self.__vector[j]
+
+                for k, number_2 in enumerate(other.__vector):
+                    number_2 = other.__vector[k]
+
+                    if i == j and j == k:
+                        difference_vector[k] = number_1 - number_2
+
+        return difference_vector
+
+        # e. Умножение вектора на скаляр
+
+    def get_multiplied_vector(self, scalar):
+        for i, item in enumerate(self.__vector):
+            self.__vector[i] *= scalar
+
+        return self.__vector
+
+    # f. Получение и установка компоненты вектора по индексу
+    def get_vector_component(self, index):
+        if index >= len(self.__vector) or index < 0:
+            raise ValueError
+
+        for i, item in enumerate(self.__vector):
+            if i == index:
+                return item
+
+    def change_vector_component(self, index, number):
+        if index >= len(self.__vector) or index < 0:
+            raise ValueError
+
+        for i, item in enumerate(self.__vector):
+            if i == index:
+                self.__vector[i] = number
+
+        return self.__vector
+
+    # Нестатический метод: разворот вектора
+    def get_reverse_vector(self, vector):
+
+        for i, number in enumerate(vector):
+            vector[i] = - number
 
 
 user_vector = Vector([1, 2, 3])
-user_vector_1 = Vector([1, 2, 3])
+user_vector_1 = Vector([1, 2, 3, 5])
 
-print(user_vector.vector_length)
+print("Свойство для получения длины вектора", user_vector.vector_length)
+print("Свойство для получения размерности вектора", user_vector.vector_dimension)
 
-print(user_vector)
+print("Реализация метода _repr_", user_vector)
 
-print(get_sum_new_vector([1, 2, 7, 3, 9], [1, 5, 5, 9, 3, 8]))
+print("Переопределение метода __eq__:", user_vector == user_vector_1)
+
+print("Прибавление к вектору другого вектора:", user_vector_1.get_sum_vector(user_vector))
+print("Вычитание из вектора другого вектора:", user_vector.get_diff_vector(user_vector_1))
+
+user_vector = Vector([1, 2, 3])
+user_vector_1 = Vector([1, 2, 4, 5])
+print("Сложение двух векторов с созданием нового:", user_vector.get_sum_new_vector(user_vector_1))
+print("Вычитание двух векторов с созданием нового:", user_vector.get_difference_new_vector(user_vector_1))
+
+user_vector = Vector([1, 2, 3])
+print("Умножение вектора на скаляр:", user_vector.get_multiplied_vector(2))
+
+print("Установка компоненты вектора по индексу:", user_vector.change_vector_component(1, 100))
