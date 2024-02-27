@@ -1,4 +1,5 @@
 from multipledispatch import dispatch
+import copy
 
 
 class Vector:
@@ -30,6 +31,14 @@ class Vector:
     @dispatch(list)
     def __init__(self, vector):
         self.__vector = vector.copy()
+
+    @dispatch(list)
+    def __init__(self, vector):
+        self.__vector = copy.copy(vector)
+
+    @property
+    def vector_length(self):
+        return len(self.__vector)
 
     def __repr__(self):
         list_length = len(self.__vector)
@@ -150,6 +159,9 @@ def get_sum_new_vector(vector_1, vector_2):
 
 user_vector = Vector([1, 2, 3])
 user_vector_1 = Vector([1, 2, 3])
+
+print(user_vector.vector_length)
+
 print(user_vector)
 
 print(get_sum_new_vector([1, 2, 7, 3, 9], [1, 5, 5, 9, 3, 8]))
