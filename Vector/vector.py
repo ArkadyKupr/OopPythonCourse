@@ -20,9 +20,14 @@ class Vector:
         self.__vector = vector
 
     # 1. с) заполнение вектора значениями из списка чисел
-    # @dispatch(list)
-    # def __init__(self, components):
-    # self.__components = components.copy()
+    @dispatch(list)
+    def __init__(self, components):
+        self.__vector = []
+
+        for i, number in enumerate(components):
+            number = components[i]
+
+            self.__vector.append(number)
 
     # 1. d) заполнение вектора значениями из списка чисел.
     # Если длина списка меньше n, то считать, что в остальных компонентах 0.
@@ -66,14 +71,14 @@ class Vector:
             numbers_string += str(number)
 
             if i != list_length - 1:
-                numbers_string += " ,"
+                numbers_string += ", "
 
         numbers_string += "}"
 
         return f"{numbers_string}"
 
-    # g. Переопределить метод __eq__, чтобы было True - векторы имеют одинаковую размерность и соответствующие компоненты
-    # равны
+    # g. Переопределить метод __eq__, чтобы было True - векторы имеют одинаковую размерность и соответствующие
+    # компоненты равны
     def __eq__(self, other):
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -235,14 +240,37 @@ class Vector:
         return self.__vector
 
     # Нестатический метод: разворот вектора
-    def get_reverse_vector(self, vector):
+    def get_reverse_vector(self):
+        for i, number in enumerate(self.__vector):
+            self.__vector[i] = (- 1) * number
 
-        for i, number in enumerate(vector):
-            vector[i] = - number
+    def scalar_multiplicate_vectors(self, other):
+        vector_1_length = len(self.__vector)
+        vector_2_length = len(other.__vector)
+
+        if vector_1_length > vector_2_length:
+            length_difference = vector_1_length - vector_2_length
+
+            for i in range(length_difference):
+                other.__vector.append(0)
+        else:
+            length_difference = vector_2_length - vector_1_length
+
+            for i in range(length_difference):
+                self.__vector.append(0)
+
+        for i, number_1 in enumerate(self.__vector):
+            self.__vector[i] = number_1
+            for j, number_2 in enumerate(other.__vector):
+                number_2 = other.__vector[j]
+                if i == j:
+                    self.__vector[i] *= number_2
+
+        return self.__vector
 
 
 user_vector = Vector([1, 2, 3])
-user_vector_1 = Vector([1, 2, 3, 5])
+user_vector_1 = Vector([1, 2, 3])
 
 print("Свойство для получения длины вектора", user_vector.vector_length)
 print("Свойство для получения размерности вектора", user_vector.vector_dimension)
@@ -255,11 +283,18 @@ print("Прибавление к вектору другого вектора:",
 print("Вычитание из вектора другого вектора:", user_vector.get_diff_vector(user_vector_1))
 
 user_vector = Vector([1, 2, 3])
-user_vector_1 = Vector([1, 2, 4, 5])
+user_vector_1 = Vector([1, 2, 4])
 print("Сложение двух векторов с созданием нового:", user_vector.get_sum_new_vector(user_vector_1))
 print("Вычитание двух векторов с созданием нового:", user_vector.get_difference_new_vector(user_vector_1))
 
-user_vector = Vector([1, 2, 3])
+user_vector = Vector([1, 2, 100, 3])
 print("Умножение вектора на скаляр:", user_vector.get_multiplied_vector(2))
 
 print("Установка компоненты вектора по индексу:", user_vector.change_vector_component(1, 100))
+
+print("Разворот вектора:", user_vector.get_reverse_vector)
+
+print("Вектор", user_vector)
+print("Вектор", user_vector_1)
+
+print(user_vector.scalar_multiplicate_vectors)
