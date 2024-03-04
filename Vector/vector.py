@@ -1,6 +1,5 @@
 import math
 from multipledispatch import dispatch
-import copy
 
 
 class Vector:
@@ -15,12 +14,12 @@ class Vector:
             self.__vector = n * [0]
 
     # 1. b) конструктор копирования
-    @dispatch(list)
+    @dispatch((list, object))
     def __init__(self, vector):
-        self.__vector = vector
+        self.__vector = vector.copy()
 
     # 1. с) заполнение вектора значениями из списка чисел
-    @dispatch(list)
+    @dispatch((list, float))
     def __init__(self, components):
         self.__vector = []
 
@@ -31,21 +30,21 @@ class Vector:
 
     # 1. d) заполнение вектора значениями из списка чисел.
     # Если длина списка меньше n, то считать, что в остальных компонентах 0.
-    @dispatch(int, list)
+    @dispatch(int, (list, object))
     def __init__(self, n, components):
         if n <= 0:
             raise ValueError
 
-        if len(components) > n:
-            raise ValueError
-
         length = len(components)
+
+        if length > n:
+            raise ValueError
 
         while length < n:
             components.append(0)
             length += 1
 
-        self.__components = components
+        self.__vector = components
 
     # 2. Свойства для получения размерности вектора и длины вектора
     @property
@@ -244,6 +243,8 @@ class Vector:
         for i, number in enumerate(self.__vector):
             self.__vector[i] = (- 1) * number
 
+        return self.__vector
+
     def scalar_multiplicate_vectors(self, other):
         vector_1_length = len(self.__vector)
         vector_2_length = len(other.__vector)
@@ -272,10 +273,10 @@ class Vector:
 user_vector = Vector([1, 2, 3])
 user_vector_1 = Vector([1, 2, 3])
 
-print("Свойство для получения длины вектора", user_vector.vector_length)
-print("Свойство для получения размерности вектора", user_vector.vector_dimension)
+print("Свойство для получения длины вектора:", user_vector.vector_length)
+print("Свойство для получения размерности вектора:", user_vector.vector_dimension)
 
-print("Реализация метода _repr_", user_vector)
+print("Реализация метода _repr_:", user_vector)
 
 print("Переопределение метода __eq__:", user_vector == user_vector_1)
 
@@ -292,9 +293,9 @@ print("Умножение вектора на скаляр:", user_vector.get_mu
 
 print("Установка компоненты вектора по индексу:", user_vector.change_vector_component(1, 100))
 
-print("Разворот вектора:", user_vector.get_reverse_vector)
+print("Разворот вектора:", user_vector.get_reverse_vector())
 
-print("Вектор", user_vector)
-print("Вектор", user_vector_1)
+print("Вектор:", user_vector)
+print("Вектор:", user_vector_1)
 
-print(user_vector.scalar_multiplicate_vectors)
+print("Скалярное произведение векторов:", user_vector.scalar_multiplicate_vectors(user_vector_1))
