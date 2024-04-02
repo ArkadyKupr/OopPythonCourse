@@ -1,5 +1,6 @@
 import math
 from multipledispatch import dispatch
+import copy
 
 
 class Vector:
@@ -16,7 +17,7 @@ class Vector:
     # 1. b) конструктор копирования
     @dispatch((list, object))
     def __init__(self, vector):
-        self.__vector = vector.copy()
+        self.__vector = copy.deepcopy(vector)
 
     # 1. с) заполнение вектора значениями из списка чисел
     @dispatch((list, float))
