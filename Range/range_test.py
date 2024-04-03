@@ -1,38 +1,34 @@
 from range import Range
 
 
-numbers_range_1 = Range(1, 10)
-number_range_2 = Range(10, 20)
-print("Интервал-пересечение двух интервалов:", numbers_range_1.get_intersection(number_range_2))
-print("Объединение двух интервалов:", numbers_range_1.get_union(number_range_2))
-print("Разность двух интервалов:", numbers_range_1.get_subtraction(number_range_2))
+def test(numbers_range_1, numbers_range_2):
+    print(f"Интервал-пересечение двух интервалов {numbers_range_1} и {numbers_range_2}:",
+          numbers_range_1.get_intersection(numbers_range_2))
+    print(f"Объединение двух интервалов {numbers_range_1} и {numbers_range_2}:",
+          numbers_range_1.get_union(numbers_range_2))
+    print(f"Разность двух интервалов {numbers_range_1} и {numbers_range_2}:",
+          numbers_range_1.get_subtraction(numbers_range_2))
+    print()
 
-numbers_range_3 = Range(10, 20)
-numbers_range_4 = Range(1, 10)
-print("Интервал-пересечение двух интервалов:", numbers_range_3.get_intersection(numbers_range_4))
-print("Объединение двух интервалов:", numbers_range_3.get_union(numbers_range_4))
-print("Разность двух интервалов:", numbers_range_3.get_subtraction(numbers_range_4))
 
-numbers_range_5 = Range(10, 13)
-numbers_range_6 = Range(11, 15)
-print("Интервал-пересечение двух интервалов:", numbers_range_5.get_intersection(numbers_range_6))
-print("Объединение двух интервалов:", numbers_range_5.get_union(numbers_range_6))
-print("Разность двух интервалов:", numbers_range_5.get_subtraction(numbers_range_6))
+test(Range(1, 10), Range(10, 20))
 
-numbers_range_7 = Range(10, 15)
-numbers_range_8 = Range(11, 13)
-print("Интервал-пересечение двух интервалов:", numbers_range_7.get_intersection(numbers_range_8))
-print("Объединение двух интервалов:", numbers_range_7.get_union(numbers_range_8))
-print("Разность двух интервалов:", numbers_range_7.get_subtraction(numbers_range_8))
+test(Range(10, 20), Range(1, 10))
 
-numbers_range_9 = Range(11, 15)
-numbers_range_10 = Range(14, 119)
-print("Интервал-пересечение двух интервалов:", numbers_range_9.get_intersection(numbers_range_10))
-print("Объединение двух интервалов:", numbers_range_9.get_union(numbers_range_10))
-print("Разность двух интервалов:", numbers_range_9.get_subtraction(numbers_range_10))
+test(Range(10, 13), Range(11, 15))
 
-numbers_range_11 = Range(14, 119)
-numbers_range_12 = Range(11, 15)
-print("Интервал-пересечение двух интервалов:", numbers_range_11.get_intersection(numbers_range_12))
-print("Объединение двух интервалов:", numbers_range_11.get_union(numbers_range_12))
-print("Разность двух интервалов:", numbers_range_11.get_subtraction(numbers_range_12))
+test(Range(10, 15), Range(11, 13))
+
+test(Range(11, 15), Range(14, 119))
+
+test(Range(14, 119), Range(11, 15))
+
+test(Range(1, 7), Range(1, 7))
+
+numbers_range = Range(13, 18)
+
+number_in_range = int(input("Введите число: "))
+line = f"Число {number_in_range} входит в диапазон {numbers_range}:"
+print(line, numbers_range.is_inside(number_in_range))
+
+print(f"Длина диапазона {numbers_range}:", numbers_range.get_length())
