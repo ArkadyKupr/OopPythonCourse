@@ -24,9 +24,11 @@ class Square(Shape):
     def __init__(self, side_length):
         self.__side_length = side_length
 
+    @property
     def get_width(self):
         return self.__side_length
 
+    @property
     def get_height(self):
         return self.__side_length
 
@@ -37,7 +39,7 @@ class Square(Shape):
         return 4 * self.__side_length
 
     def __repr__(self):
-        return f"Square({self.__side_length})"
+        return f"Square(side_length: {self.__side_length})"
 
     def __hash__(self):
         return hash(self.__side_length)
@@ -58,22 +60,33 @@ class Triangle(Shape):
         self.__x_3 = x_3
         self.__y_3 = y_3
 
+    @property
     def get_width(self):
         return max(self.__x_1, self.__x_2, self.__x_3) - min(self.__x_1, self.__x_2, self.__x_3)
 
+    @property
     def get_height(self):
         return max(self.__y_1, self.__y_2, self.__y_3) - min(self.__y_1, self.__y_2, self.__y_3)
 
-    def get_area(self):
-        EPSILON = 1.0e-10
+    def be_lying_in_one_line(self):
+        epsilon = 1.0e-10
 
         if abs((self.__y_1 - self.__y_2) * (self.__x_2 - self.__x_3) - (self.__y_2 - self.__y_3) * (
-                self.__x_1 - self.__x_2)) < EPSILON:
-            return "Точки лежат на одной прямой"
+                self.__x_1 - self.__x_2)) < epsilon:
+            return True
 
-        side_a_length = math.sqrt((self.__x_1 - self.__x_2) ** 2 + (self.__y_1 - self.__y_2) ** 2)
-        side_b_length = math.sqrt((self.__x_1 - self.__x_3) ** 2 + (self.__y_1 - self.__y_3) ** 2)
-        side_c_length = math.sqrt((self.__x_3 - self.__x_2) ** 2 + (self.__y_3 - self.__y_2) ** 2)
+        return False
+
+    def get_side_length(self, x_1, y_1, x_2, y_2):
+        return math.sqrt((x_1 - x_2) ** 2 + (y_1 - y_2) ** 2)
+
+    def get_area(self):
+        if Triangle.be_lying_in_one_line(self):
+            return 0
+
+        side_a_length = Triangle.get_side_length(self, self.__x_1, self.__y_1, self.__x_2, self.__y_2)
+        side_b_length = Triangle.get_side_length(self, self.__x_1, self.__y_1, self.__x_3, self.__y_3)
+        side_c_length = Triangle.get_side_length(self, self.__x_2, self.__y_2, self.__x_3, self.__y_3)
 
         half_perimeter = (side_a_length + side_b_length + side_c_length) / 2
         triangle_area = math.sqrt(
@@ -83,18 +96,14 @@ class Triangle(Shape):
         return triangle_area
 
     def get_perimeter(self):
-        EPSILON = 1.0e-10
-
-        if abs((self.__y_1 - self.__y_2) * (self.__x_2 - self.__x_3) - (self.__y_2 - self.__y_3) * (
-                self.__x_1 - self.__x_2)) < EPSILON:
-            return "Точки лежат на одной прямой"
+        if Triangle.be_lying_in_one_line(self):
+            return 0
 
         side_a_length = math.sqrt((self.__x_1 - self.__x_2) ** 2 + (self.__y_1 - self.__y_2) ** 2)
         side_b_length = math.sqrt((self.__x_1 - self.__x_3) ** 2 + (self.__y_1 - self.__y_3) ** 2)
         side_c_length = math.sqrt((self.__x_3 - self.__x_2) ** 2 + (self.__y_3 - self.__y_2) ** 2)
 
-        perimeter = side_a_length + side_b_length + side_c_length
-        return perimeter
+        return side_a_length + side_b_length + side_c_length
 
     def __repr__(self):
         return f"Triangle(({self.__x_1}, {self.__y_1}); ({self.__x_2}, {self.__y_2}); ({self.__x_3}, {self.__y_3})"
@@ -111,49 +120,47 @@ class Triangle(Shape):
 
 
 class Rectangle(Shape):
-    def __init__(self, rectangle_length, rectangle_width):
-        self.__rectangle_length = rectangle_length
-        self.__rectangle_width = rectangle_width
+    def __init__(self, height, width):
+        self.__height = height
+        self.__width = width
 
+    @property
     def get_width(self):
-        return max(self.__rectangle_width, self.__rectangle_length)
+        return self.__width
 
+    @property
     def get_height(self):
-        return min(self.__rectangle_width, self.__rectangle_length)
-
-    def get_length(self):
-        return self.__rectangle_length
+        return self.__height
 
     def get_area(self):
-        return self.__rectangle_length * self.__rectangle_width
+        return self.__height * self.__width
 
     def get_perimeter(self):
-        return 2 * (self.__rectangle_length + self.__rectangle_width)
+        return 2 * (self.__height + self.__width)
 
     def __repr__(self):
-        return f"Rectangle({self.__rectangle_width}, {self.__rectangle_length})"
+        return f"Rectangle(width: {self.__width}, height: {self.__height})"
 
     def __hash__(self):
-        return hash((self.__rectangle_width, self.__rectangle_length))
+        return hash((self.__width, self.__height))
 
     def __eq__(self, other):
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        return self.__rectangle_width == other.__rectangle_width and self.__rectangle_length == other.__rectangle_length
+        return self.__width == other.__width and self.__height == other.__height
 
 
 class Circle(Shape):
     def __init__(self, radius):
         self.__radius = radius
 
+    @property
     def get_width(self):
         return 2 * self.__radius
 
+    @property
     def get_height(self):
-        return 2 * self.__radius
-
-    def get_length(self):
         return 2 * self.__radius
 
     def get_area(self):
@@ -163,7 +170,7 @@ class Circle(Shape):
         return 2 * math.pi * self.__radius
 
     def __repr__(self):
-        return f"Circle({self.__radius})"
+        return f"Circle(radius: {self.__radius})"
 
     def __hash__(self):
         return hash(self.__radius)
@@ -173,23 +180,3 @@ class Circle(Shape):
             return NotImplemented
 
         return self.__radius == other.__radius
-
-
-shapes = [Circle(10), Rectangle(5, 10), Triangle(5, 9, 0, 8, 7, 13), Square(5), Square(15)]
-
-area = []
-
-for s in shapes:
-    area.append((s.get_area(), s))
-
-
-def get_shape_area(item):
-    return item.get_area()
-
-
-def get_shape_perimeter(item):
-    return item.get_perimeter()
-
-
-print("Фигура с максимальной площадью:", sorted(shapes, key=get_shape_area)[len(shapes) - 1])
-print("Фигура со вторым по величине периметром:", sorted(shapes, key=get_shape_perimeter)[1])
