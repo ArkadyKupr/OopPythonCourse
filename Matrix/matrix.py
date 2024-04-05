@@ -95,6 +95,7 @@ class Matrix:
 
     # self.__matrix[index] = vector
 
+    # 4. d) Метод __repr__ определить, чтобы результат был в виде: {{1, 2}, {2, 3}}
     def __repr__(self):
         quantity = len(self.__matrix)
 
@@ -121,43 +122,49 @@ class Matrix:
         return f"{numbers_string}"
 
     # 4. c) Вычисление определителя матрицы:
+    def calculate_determinant(self):
+        m = len(self.__matrix)
+        n = len(self.__matrix[0])
 
-    def calculate_determinant(self, matrix=None):
-        if matrix is not None:
-            matrix = copy.copy(self.__matrix)
-
-        m = len(matrix)
-        n = len(matrix[0])
-
-        if n <= 0 or m <= 0 or n != m:
+        if n == 0 or m == 0 or n != m:
             raise ValueError
 
-        determinant = 0
-
         if n == 1:
-            determinant = matrix[0][0]
-        elif n == 2:
-            determinant = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
-        else:
-            for k in range(n):
-                intermediate_matrix = []
+            return self.__matrix[0][0]
+        if n == 2:
+            return self.__matrix[0][0] * self.__matrix[1][1] - self.__matrix[1][0] * self.__matrix[0][1]
 
-                for i in range(n - 1):
-                    intermediate_matrix.append(n * [0])
+        def calculate_determinant_1(matrix):
+            size = len(matrix[0])
 
-                for i in range(1, n):
-                    for j in range(0, k):
-                        intermediate_matrix[i - 1][j] = matrix[i][j]
+            if size == 1:
+                return matrix[0][0]
+            elif size == 2:
+                return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
+            else:
+                determinant = 0
 
-                    for j in range(k + 1, n):
-                        intermediate_matrix[i - 1][j - 1] = matrix[i][j]
+                for k in range(size):
+                    intermediate_matrix = []
 
-                determinant += pow(-1, k) * matrix[0][k] * self.calculate_determinant(self, intermediate_matrix)
+                    for i in range(size - 1):
+                        intermediate_matrix.append((size - 1) * [0])
+                        print(intermediate_matrix)
 
-        return determinant
+                    for i in range(1, size):
+                        for j in range(0, k):
+                            intermediate_matrix[i - 1][j] = matrix[i][j]
 
+                        for j in range(k + 1, size):
+                            intermediate_matrix[i - 1][j - 1] = matrix[i][j]
 
-            # 4. d) Метод __repr__ определить, чтобы результат был в виде: {{1, 2}, {2, 3}}
+                    print(":", intermediate_matrix)
+
+                    determinant += pow(-1, k) * matrix[0][k] * calculate_determinant_1(intermediate_matrix)
+
+                return determinant
+
+        return calculate_determinant_1(self.__matrix)
 
 
 user_matrix = Matrix(2, 5)
@@ -176,9 +183,6 @@ print("Размер матрицы:", user_matrix_1.matrix_dimensions)
 
 print(user_matrix.get_string_vector(1))
 
-# user_matrix.exchange_string_vector(2, [1, 2, 5])
-# print(user_matrix)
-
 print(user_matrix_1.get_multiplied_matrix(100))
 
 user_matrix_1 = Matrix([[1, 2], [3, 6], [3, 6]])
@@ -186,4 +190,9 @@ user_matrix_4 = Matrix([[1, 2, 5], [3, 6, 2]])
 
 print("Сумма векторов:", user_matrix_1.get_sum_of_two_matrix(user_matrix_4))
 
-print("Детерминант:", Matrix.calculate_determinant([[1, 9, 8], [7, 7, -7], [7, 90, -7]]))
+user_matrix_5 = Matrix([[1, 1, 80, 12], [1, 3, 3, 45], [3, 4, 6, 0], [4, 8, 45, 87]])
+print(user_matrix_5)
+
+determinant = user_matrix_5.calculate_determinant()
+
+print("Детерминант:", determinant)
