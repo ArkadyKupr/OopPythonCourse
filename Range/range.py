@@ -71,4 +71,3 @@ class Range:
 
     def is_inside(self, number):
         return self.__start <= number <= self.__end
-

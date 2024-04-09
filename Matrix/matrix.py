@@ -59,6 +59,20 @@ class Matrix:
 
         return self.__matrix[index]
 
+    def set_string_vector(self, vector, index):
+        if index >= len(self.__matrix):
+            raise ValueError
+
+        matrix_width = len(self.__matrix[0])
+
+        if len(vector) != matrix_width:
+            raise ValueError
+
+        for i in range(matrix_width):
+            self.__matrix[index][i] = vector[i]
+
+        return self.__matrix
+
     # 3. b) Умножение на скаляр
     def get_multiplied_matrix(self, scalar):
         matrix_length = len(self.__matrix)
@@ -70,30 +84,145 @@ class Matrix:
 
         return self.__matrix
 
-    # 3. c) Прибавление к матрицы другой матрицы:
-    def get_sum_of_two_matrix(self, other):
+    # 3. c) Прибавление к матрице другой матрицы:
+    def summarize(self, other):
         matrix_1_length = len(self.__matrix)
+        matrix_1_width = len(self.__matrix[0])
+
         matrix_2_length = len(other.__matrix)
+        matrix_2_width = len(other.__matrix[0])
+
+        if matrix_1_length != matrix_2_length and matrix_1_width != matrix_2_width:
+            raise ValueError
+
+        for i in range(matrix_1_length):
+            for j in range(matrix_1_width):
+                self.__matrix[i][j] += other.__matrix[i][j]
+
+        return self.__matrix
+
+    # 3. d) Вычитание из матрицы другой матрицы:
+    def subtract(self, other):
+        matrix_1_length = len(self.__matrix)
+        matrix_1_width = len(self.__matrix[0])
+
+        matrix_2_length = len(other.__matrix)
+        matrix_2_width = len(other.__matrix[0])
+
+        if matrix_1_length != matrix_2_length and matrix_1_width != matrix_2_width:
+            raise ValueError
+
+        for i in range(matrix_1_length):
+            for j in range(matrix_1_width):
+                self.__matrix[i][j] -= other.__matrix[i][j]
+
+        return self.__matrix
+
+    # 3. e) Прибавление к матрице другой матрицы:
+    def get_sum_matrix(self, other):
+        matrix_1_length = len(self.__matrix)
+        matrix_1_width = len(self.__matrix[0])
+
+        matrix_2_length = len(other.__matrix)
+        matrix_2_width = len(other.__matrix[0])
+
+        if matrix_1_length != matrix_2_length and matrix_1_width != matrix_2_width:
+            raise ValueError
 
         sum_matrix = []
 
         for i in range(matrix_1_length):
-            sum_matrix.append(matrix_1_length * [0])
+            sum_matrix.append(matrix_1_width * [0])
 
         for i in range(matrix_1_length):
-
-            for j in range(matrix_1_length):
-
-                for k in range(matrix_2_length):
-                    sum_matrix[i][j] += self.__matrix[i][k] * other.__matrix[k][j]
+            for j in range(matrix_1_width):
+                sum_matrix[i][j] = self.__matrix[i][j] + other.__matrix[i][j]
 
         return sum_matrix
 
-    # def exchange_string_vector(self, index, vector):
-    # if index >= len(self.__matrix):
-    # raise ValueError
+    # 3. f) Вычитание матриц:
+    def get_subtracted_matrix(self, other):
+        matrix_1_length = len(self.__matrix)
+        matrix_1_width = len(self.__matrix[0])
 
-    # self.__matrix[index] = vector
+        matrix_2_length = len(other.__matrix)
+        matrix_2_width = len(other.__matrix[0])
+
+        if matrix_1_length != matrix_2_length and matrix_1_width != matrix_2_width:
+            raise ValueError
+
+        subtracted_matrix = []
+
+        for i in range(matrix_1_length):
+            subtracted_matrix.append(matrix_1_width * [0])
+
+        for i in range(matrix_1_length):
+            for j in range(matrix_1_width):
+                subtracted_matrix[i][j] = self.__matrix[i][j] - other.__matrix[i][j]
+
+        return subtracted_matrix
+
+    # 3. g) Умножение матриц:
+    def get_multiplication(self, other):
+        matrix_1_length = len(self.__matrix)
+        matrix_2_length = len(other.__matrix)
+
+        multiplication_matrix = []
+
+        for i in range(matrix_1_length):
+            multiplication_matrix.append(matrix_1_length * [0])
+
+        for i in range(matrix_1_length):
+            for j in range(matrix_1_length):
+                for k in range(matrix_2_length):
+                    multiplication_matrix[i][j] += self.__matrix[i][k] * other.__matrix[k][j]
+
+        return multiplication_matrix
+
+    # 3. h) Умножение матрицы на вектор-столбец:
+    def get_multiplication_vector(self, vector):
+        matrix_length = len(self.__matrix)
+        matrix_width = len(self.__matrix[0])
+
+        vector_length = len(vector)
+
+        multiplied_vector = []
+
+        for i in range(matrix_length):
+            multiplied_vector.append(0)
+
+        if vector_length != matrix_width:
+            raise ValueError
+
+        for i in range(matrix_length):
+            for j in range(matrix_width):
+                multiplied_vector[i] += self.__matrix[i][j] * vector[j]
+
+        return multiplied_vector
+
+    # 3. i) Переопределить методы __eq__ и __hash__:
+    def __eq__(self, other):
+        if other.__matrix.__hash__ != self.__matrix.__hash__:
+            return False
+
+        matrix_1_length = len(self.__matrix)
+        matrix_2_length = len(other.__matrix)
+
+        matrix_1_width = len(self.__matrix[0])
+        matrix_2_width = len(other.__matrix[0])
+
+        if matrix_1_length == matrix_2_length and matrix_1_width == matrix_2_width:
+            for i in range(matrix_1_length):
+                for j in range(matrix_1_width):
+                    if self.__matrix[i][j] != other.__matrix[i][j]:
+                        return False
+
+            return True
+
+        return False
+
+    def __hash__(self):
+        return hash(self.__matrix)
 
     # 4. d) Метод __repr__ определить, чтобы результат был в виде: {{1, 2}, {2, 3}}
     def __repr__(self):
@@ -120,6 +249,37 @@ class Matrix:
         numbers_string += "}"
 
         return f"{numbers_string}"
+
+    # 4. а) Получение вектора-столбца по индексу:
+    def get_column_vector(self, index):
+        n = len(self.__matrix)
+        m = len(self.__matrix[0])
+
+        if index >= m:
+            raise ValueError
+
+        column_vector = []
+
+        for i in range(n):
+            column_vector.append(self.__matrix[i][index])
+
+        return column_vector
+
+    # 4. b) Транспонирование матрицы:
+    def transpose(self):
+        n = len(self.__matrix)
+        m = len(self.__matrix[0])
+
+        multiplication_matrix = []
+
+        for i in range(m):
+            multiplication_matrix.append(n * [0])
+
+        for i in range(n):
+            for j in range(m):
+                multiplication_matrix[j][i] = self.__matrix[i][j]
+
+        return multiplication_matrix
 
     # 4. c) Вычисление определителя матрицы:
     def calculate_determinant(self):
@@ -149,7 +309,6 @@ class Matrix:
 
                     for i in range(size - 1):
                         intermediate_matrix.append((size - 1) * [0])
-                        print(intermediate_matrix)
 
                     for i in range(1, size):
                         for j in range(0, k):
@@ -157,8 +316,6 @@ class Matrix:
 
                         for j in range(k + 1, size):
                             intermediate_matrix[i - 1][j - 1] = matrix[i][j]
-
-                    print(":", intermediate_matrix)
 
                     determinant += pow(-1, k) * matrix[0][k] * calculate_determinant_1(intermediate_matrix)
 
@@ -181,18 +338,45 @@ print(user_matrix_3)
 
 print("Размер матрицы:", user_matrix_1.matrix_dimensions)
 
-print(user_matrix.get_string_vector(1))
+print("Получение вектора-строки по индексу:", user_matrix.get_string_vector(1))
 
-print(user_matrix_1.get_multiplied_matrix(100))
+print("Задание вектора-строки по индексу:", user_matrix_1.set_string_vector([1, 4], 1))
+
+print("Умножение на скаляр:", user_matrix_1.get_multiplied_matrix(100))
 
 user_matrix_1 = Matrix([[1, 2], [3, 6], [3, 6]])
 user_matrix_4 = Matrix([[1, 2, 5], [3, 6, 2]])
 
-print("Сумма векторов:", user_matrix_1.get_sum_of_two_matrix(user_matrix_4))
+print("Умножение двух матриц:", user_matrix_1.get_multiplication(user_matrix_4))
+
+print("Получить вектор-столбец:", user_matrix_4.get_column_vector(2))
 
 user_matrix_5 = Matrix([[1, 1, 80, 12], [1, 3, 3, 45], [3, 4, 6, 0], [4, 8, 45, 87]])
 print(user_matrix_5)
 
-determinant = user_matrix_5.calculate_determinant()
+user_matrix_6 = Matrix([[1, 1, 80, 12], [1, 3, 3, 45], [3, 4, 6, 0]])
+print("Транспонирование матрицу:", user_matrix_6.transpose())
 
-print("Детерминант:", determinant)
+determinant = user_matrix_5.calculate_determinant()
+print("Вычисление определителя матрицы:", determinant)
+
+user_matrix_7 = Matrix([[1, 2], [3, 6], [3, 6]])
+user_matrix_8 = Matrix([(1, 2), (3, 6), (5, 7)])
+print("Прибавление к матрице другой матрицы:", user_matrix_7.summarize(user_matrix_8))
+
+user_matrix_9 = Matrix([[1, 2], [3, 6], [3, 6]])
+user_matrix_10 = Matrix([[1, 2], [3, 6], [5, 7]])
+print("Вычитание из матрицы другой матрицы:", user_matrix_9.subtract(user_matrix_10))
+
+user_matrix_9 = Matrix([[1, 2], [3, 6], [3, 6]])
+user_matrix_10 = Matrix([[1, 2], [3, 6], [5, 7]])
+print("Сложение матриц:", user_matrix_9.get_sum_matrix(user_matrix_10))
+print("Вычитание матриц:", user_matrix_9.get_subtracted_matrix(user_matrix_10))
+
+user_matrix_11 = Matrix([[1, 2], [3, 6], [3, 6]])
+print("Умножение матрицы на вектор-столбец:", user_matrix_11.get_multiplication_vector([1, 2]))
+
+user_matrix_12 = Matrix([[1, 2], [3, 6], [3, 6]])
+user_matrix_13 = Matrix([[1, 2], [3, 6], [3, 6]])
+print("Переопределить метод __eq__:", user_matrix_12.__eq__(user_matrix_13))
+print("Переопределить метод __hash__:", user_matrix_13.__hash__)
