@@ -23,8 +23,8 @@ class Range:
         return f"({self.__start}; {self.__end})"
 
     def get_intersection(self, other):
-        if ((self.__end < other.__start and other.__end < self.__start) or
-                self.__end > other.__start and other.__end > self.__start):
+        if ((self.__end <= other.__start) or
+                (self.__start >= other.__end)):
             return None
         # один интервал входит в другой
         else:
@@ -32,33 +32,28 @@ class Range:
 
     def get_union(self, other):
         if self.__end < other.__start or other.__end < self.__start:
-            return Range(self.__start, self.__end), Range(other.__start, other.__end)
+            return [Range(self.__start, self.__end), Range(other.__start, other.__end)]
         # один интервал входит в другой
-        elif other.__start >= self.__start and other.__end <= self.__end:
-            return Range(self.__start, self.__end)
-        elif self.__start >= other.__start and self.__end <= other.__end:
-            return Range(other.__start, other.__end)
-        # интервалы пересекаются
-        elif self.__start < other.__start:
-            return Range(self.__start, other.__end)
         else:
-            return Range(other.__start, self.__end)
+            return [Range(min(other.__start, self.__start), max(self.__end, other.__end))]
 
-    def get_subtraction(self, other):
-        if self.__start == other.__start and self.__end == other.__end:
-            return []
-        elif self.__end < other.__start or other.__end < self.__start:
-            return Range(self.__start, self.__end), Range(other.__start, other.__end)
-        # один интервал входит в другой
-        elif other.__start >= self.__start and other.__end <= self.__end:
-            return Range(self.__start, other.__start), Range(other.__end, self.__end)
-        elif self.__start >= other.__start and self.__end <= other.__end:
-            return Range(other.__start, self.__start), Range(self.__end, other.__end)
-        # интервалы пересекаются
-        elif self.__start < other.__start:
-            return Range(self.__start, other.__start), Range(self.__end, other.__end)
-        else:
-            return Range(other.__start, self.__start), Range(other.__end, self.__end)
+    def get_difference(self, other):
+        # вычитаемый интервал входит в интервал, из которого вычитают
+        if ((self.__start <= other.__start and self.__end <= other.__start) or
+                (self.__start >= other.__end and self.__end >= other.__end)):
+            return [Range(self.__start, self.__end)]
+        elif self.__start <= other.__start and self.__end <= other.__end:
+            if self.__start == other.__start:
+                return []
+            else:
+                return [Range(self.__start, other.__start)]
+        elif self.__start >= other.__start and self.__end >= other.__end:
+            if self.__end == other.__end:
+                return []
+            else:
+                return [Range(other.__end, self.__end)]
+
+        return [Range(self.__start, other.__start), Range(other.__end, self.__end)]
 
     def get_length(self):
         return self.__end - self.__start

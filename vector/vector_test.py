@@ -1,4 +1,4 @@
-from vector import Vector
+from vector.vector import Vector
 
 
 user_vector = Vector([1, 2, 3])
