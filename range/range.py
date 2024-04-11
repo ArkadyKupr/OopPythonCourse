@@ -24,7 +24,7 @@ class Range:
 
     def get_intersection(self, other):
         if self.__end <= other.__start or other.__end <= self.__start:
-            return []
+            return None
         # один интервал входит в другой
         elif other.__start >= self.__start and other.__end <= self.__end:
             return Range(other.__start, other.__end)
