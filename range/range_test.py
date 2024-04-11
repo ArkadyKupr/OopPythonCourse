@@ -2,11 +2,11 @@ from range import Range
 
 
 def test(numbers_range_1, numbers_range_2):
-    print(f"Интервал-пересечение двух интервалов [{numbers_range_1}] и [{numbers_range_2}]:",
+    print(f"Интервал-пересечение двух интервалов {numbers_range_1} и {numbers_range_2}:",
           numbers_range_1.get_intersection(numbers_range_2))
-    print(f"Объединение двух интервалов [{numbers_range_1}] и [{numbers_range_2}]:",
+    print(f"Объединение двух интервалов {numbers_range_1} и {numbers_range_2}:",
           numbers_range_1.get_union(numbers_range_2))
-    print(f"Разность двух интервалов [{numbers_range_1}] и [{numbers_range_2}]:",
+    print(f"Разность двух интервалов {numbers_range_1} и {numbers_range_2}:",
           numbers_range_1.get_subtraction(numbers_range_2))
     print()
 
