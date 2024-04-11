@@ -23,18 +23,12 @@ class Range:
         return f"({self.__start}; {self.__end})"
 
     def get_intersection(self, other):
-        if self.__end <= other.__start or other.__end <= self.__start:
+        if ((self.__end < other.__start and other.__end < self.__start) or
+                self.__end > other.__start and other.__end > self.__start):
             return None
         # один интервал входит в другой
-        elif other.__start >= self.__start and other.__end <= self.__end:
-            return Range(other.__start, other.__end)
-        elif self.__start >= other.__start and self.__end <= other.__end:
-            return Range(self.__start, self.__end)
-        # интервалы пересекаются
-        elif self.__start < other.__start:
-            return Range(other.__start, self.__end)
         else:
-            return Range(self.__start, other.__end)
+            return [Range(max(other.__start, self.__start), min(self.__end, other.__end))]
 
     def get_union(self, other):
         if self.__end < other.__start or other.__end < self.__start:
@@ -71,4 +65,3 @@ class Range:
 
     def is_inside(self, number):
         return self.__start <= number <= self.__end
-
