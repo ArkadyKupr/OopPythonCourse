@@ -38,18 +38,20 @@ class Range:
             return [Range(min(other.__start, self.__start), max(self.__end, other.__end))]
 
     def get_difference(self, other):
-        # вычитаемый интервал входит в интервал, из которого вычитают
         if ((self.__start <= other.__start and self.__end <= other.__start) or
                 (self.__start >= other.__end and self.__end >= other.__end)):
             return [Range(self.__start, self.__end)]
+
         elif self.__start <= other.__start and self.__end <= other.__end:
             if self.__start == other.__start:
                 return []
             else:
                 return [Range(self.__start, other.__start)]
+
         elif self.__start >= other.__start and self.__end >= other.__end:
             if self.__end == other.__end:
                 return []
+
             else:
                 return [Range(other.__end, self.__end)]
 
