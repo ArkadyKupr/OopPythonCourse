@@ -4,8 +4,14 @@ from vector import Vector
 user_vector = Vector([1, 2, 3])
 user_vector_1 = Vector([1, 2, 3])
 
-print("Свойство для получения длины вектора:", user_vector.vector_length)
-print("Свойство для получения размерности вектора:", user_vector.vector_dimension)
+user_vector_2 = Vector(2)
+print("a:", user_vector_2)
+
+user_vector_3 = Vector(7, [1, 2, 5, 8])
+print("d:", user_vector_3)
+
+print("Свойство для получения длины вектора:", user_vector_3.get_length())
+print("Свойство для получения размерности вектора:", user_vector_3.dimension)
 
 print("Реализация метода _repr_:", user_vector)
 
