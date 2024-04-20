@@ -1,4 +1,4 @@
-from shapes import Shape
+from shape import Shape
 import math
 
 
@@ -70,9 +70,6 @@ class Triangle(Shape):
         side_a_length = self.__get_side_length(self.__x_1, self.__y_1, self.__x_2, self.__y_2)
         side_b_length = self.__get_side_length(self.__x_1, self.__y_1, self.__x_3, self.__y_3)
         side_c_length = self.__get_side_length(self.__x_2, self.__y_2, self.__x_3, self.__y_3)
-
-        if self.__lie_on_same_line():
-            return max(side_a_length, side_b_length, side_c_length)
 
         return side_a_length + side_b_length + side_c_length
 
