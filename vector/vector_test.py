@@ -1,38 +1,49 @@
 from vector import Vector
 
 
-user_vector = Vector([1, 2, 3])
-user_vector_1 = Vector([1, 2, 3])
+vector_1 = Vector([1, 2, 3, 0])
+vector_2 = Vector([1, 2, 3])
 
-user_vector_2 = Vector(2)
-print("a:", user_vector_2)
+vector_3 = Vector(2)
+print("a:", vector_3)
 
-user_vector_3 = Vector(7, [1, 2, 5, 8])
-print("d:", user_vector_3)
+vector_4 = Vector(7, [1, 2, 5, 8])
+print("d:", vector_4)
 
-print("Свойство для получения длины вектора:", user_vector_3.get_length())
-print("Свойство для получения размерности вектора:", user_vector_3.dimension)
+print("Свойство для получения длины вектора:", vector_4.get_length())
+print("Свойство для получения размерности вектора:", vector_4.dimension)
 
-print("Реализация метода _repr_:", user_vector)
+print("Реализация метода __repr__:", vector_1)
 
-print("Переопределение метода __eq__:", user_vector == user_vector_1)
+print("Переопределение метода __eq__:", vector_1 == vector_2)
 
-print("Прибавление к вектору другого вектора:", user_vector_1.get_sum_vector(user_vector))
-print("Вычитание из вектора другого вектора:", user_vector.get_diff_vector(user_vector_1))
+print("Переопределение метода __hash__:", hash(vector_1))
 
-user_vector = Vector([1, 2, 3])
-user_vector_1 = Vector([1, 2, 4])
-print("Сложение двух векторов с созданием нового:", user_vector.get_sum_new_vector(user_vector_1))
-print("Вычитание двух векторов с созданием нового:", user_vector.get_difference_new_vector(user_vector_1))
+vector_2 += vector_1
+print("Прибавление к вектору другого вектора:", vector_2)
 
-user_vector = Vector([1, 2, 100, 3])
-print("Умножение вектора на скаляр:", user_vector.get_multiplied_vector(2))
+vector_2 -= vector_1
+print("Вычитание из вектора другого вектора:", vector_2)
 
-print("Установка компоненты вектора по индексу:", user_vector.change_vector_component(1, 100))
+vector_1 = Vector([1, 2, 3, 0])
+vector_2 = Vector([1, 2, 4, 0, 0])
+print("Сложение двух векторов с созданием нового:", Vector(vector_1 + vector_2))
+print("Вычитание двух векторов с созданием нового:", Vector(vector_1 - vector_2))
 
-print("Разворот вектора:", user_vector.get_reverse_vector())
+vector_1 = Vector([1, 2, 100, 3])
+vector_1 *= -1
+print("Умножение вектора на скаляр:", vector_1)
 
-print("Вектор:", user_vector)
-print("Вектор:", user_vector_1)
+print("Получение компоненты вектора по индексу:", vector_1[1])
 
-print("Скалярное произведение векторов:", user_vector.scalar_multiplicate_vectors(user_vector_1))
+vector_1[1] = 100
+print("Установка компоненты вектора по индексу:", vector_1)
+
+print("Разворот вектора:", vector_1.reverse_vector())
+
+print("Вектор:", vector_1)
+print("Вектор:", vector_2)
+
+vector_5 = [1, 9, 0, 10]
+vector_6 = [1, 3, 7]
+print("Скалярное произведение векторов:", Vector(Vector.get_scalar_multiplication(vector_1, vector_2)))

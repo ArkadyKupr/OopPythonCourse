@@ -88,190 +88,200 @@ class Vector:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        return (len(self.__vector_components) == len(other.__vector_components)
-                and self.__vector_components == other.__vector_components)
+        return self.__vector_components == other.__vector_components
 
     def __hash__(self):
-        return hash((self.__vector_length, self.__vector_components))
+        return hash(tuple(self.__vector_components))
 
     # 4. Реализовать операторы:
     # a. Прибавление к вектору другого вектора
-    def get_sum_vector(self, other):
+    def __iadd__(self, other):
+        if not isinstance(self.__vector_components, list):
+            raise TypeError(f"{self.__vector_components} не является вектором")
+
+        if not isinstance(other.__vector_components, list):
+            raise TypeError(f"{self.__vector_components} не является вектором")
+
         vector_1_length = len(self.__vector_components)
         vector_2_length = len(other.__vector_components)
 
         if vector_1_length > vector_2_length:
-            length_difference = vector_1_length - vector_2_length
+            for i in range(vector_2_length):
+                self.__vector_components[i] += other.__vector_components[i]
 
-            for i in range(length_difference):
-                other.__vector_components.append(0)
         else:
-            length_difference = vector_2_length - vector_1_length
+            lengths_difference = vector_2_length - vector_1_length
 
-            for i in range(length_difference):
+            for i in range(lengths_difference):
                 self.__vector_components.append(0)
 
-        for i, number_1 in enumerate(self.__vector_components):
-            number_1 = self.__vector_components[i]
+            for i in range(vector_2_length):
+                self.__vector_components[i] += other.__vector_components[i]
 
-            for j, number_2 in enumerate(other.__vector_components):
-                if i == j:
-                    number_2 = other.__vector_components[i]
-                    number_1 += number_2
-                    self.__vector_components[i] = number_1
-
-        return self.__vector_components
+        return self
 
     # b. Вычитание из вектора другого вектора
-    def get_diff_vector(self, other):
+    def __isub__(self, other):
+        if not isinstance(self.__vector_components, list):
+            raise TypeError(f"{self.__vector_components} не является вектором")
+
+        if not isinstance(other.__vector_components, list):
+            raise TypeError(f"{self.__vector_components} не является вектором")
+
         vector_1_length = len(self.__vector_components)
         vector_2_length = len(other.__vector_components)
 
         if vector_1_length > vector_2_length:
-            length_difference = vector_1_length - vector_2_length
+            for i in range(vector_2_length):
+                self.__vector_components[i] -= other.__vector_components[i]
 
-            for i in range(length_difference):
-                other.__vector_components.append(0)
         else:
-            length_difference = vector_2_length - vector_1_length
+            lengths_difference = vector_2_length - vector_1_length
 
-            for i in range(length_difference):
+            for i in range(lengths_difference):
                 self.__vector_components.append(0)
 
-        for i, number_1 in enumerate(self.__vector_components):
-            number_1 = self.__vector_components[i]
+            for i in range(vector_2_length):
+                self.__vector_components[i] -= other.__vector_components[i]
 
-            for j, number_2 in enumerate(other.__vector_components):
-                if i == j:
-                    number_2 = other.__vector_components[i]
-                    self.__vector_components[i] = number_1 - number_2
-
-        return self.__vector_components
+        return self
 
     # с. Сложение двух векторов - должен создаваться новый вектор
-    def get_sum_new_vector(self, other):
+    def __add__(self, other):
+        if not isinstance(self.__vector_components, list):
+            raise TypeError(f"{self.__vector_components} не является вектором")
+
+        if not isinstance(other.__vector_components, list):
+            raise TypeError(f"{self.__vector_components} не является вектором")
+
         vector_1_length = len(self.__vector_components)
         vector_2_length = len(other.__vector_components)
 
-        max_length = vector_1_length if vector_1_length > vector_2_length else vector_2_length
-
         sum_vector = []
-        for i in range(max_length):
-            sum_vector.append(0)
 
         if vector_1_length > vector_2_length:
-            length_difference = vector_1_length - vector_2_length
+            for i in range(vector_1_length):
+                sum_vector.append(0)
 
-            for i in range(length_difference):
-                other.__vector_components.append(0)
+            for i in range(vector_2_length):
+                sum_vector[i] = self.__vector_components[i] + other.__vector_components[i]
+
+            for i in range(vector_2_length, vector_1_length):
+                sum_vector[i] = self.__vector_components[i]
+
         else:
-            length_difference = vector_2_length - vector_1_length
+            for i in range(vector_2_length):
+                sum_vector.append(0)
 
-            for i in range(length_difference):
-                self.__vector_components.append(0)
+            for i in range(vector_1_length):
+                sum_vector[i] = self.__vector_components[i] + other.__vector_components[i]
 
-        for i, sum_number in enumerate(sum_vector):
-
-            for j, number_1 in enumerate(self.__vector_components):
-                number_1 = self.__vector_components[j]
-
-                for k, number_2 in enumerate(other.__vector_components):
-                    number_2 = other.__vector_components[k]
-
-                    if i == j and j == k:
-                        sum_vector[k] = number_1 + number_2
+            for i in range(vector_1_length, vector_2_length):
+                sum_vector[i] = other.__vector_components[i]
 
         return sum_vector
 
     # d. Вычитание векторов - должен создаваться новый вектор
-    def get_difference_new_vector(self, other):
+    def __sub__(self, other):
+        if not isinstance(self.__vector_components, list):
+            raise TypeError(f"{self.__vector_components} не является вектором")
+
+        if not isinstance(other.__vector_components, list):
+            raise TypeError(f"{self.__vector_components} не является вектором")
+
         vector_1_length = len(self.__vector_components)
         vector_2_length = len(other.__vector_components)
 
-        max_length = vector_1_length if vector_1_length > vector_2_length else vector_2_length
-
         difference_vector = []
-        for i in range(max_length):
-            difference_vector.append(0)
 
         if vector_1_length > vector_2_length:
-            length_difference = vector_1_length - vector_2_length
+            for i in range(vector_1_length):
+                difference_vector.append(0)
 
-            for i in range(length_difference):
-                other.__vector_components.append(0)
+            for i in range(vector_2_length):
+                difference_vector[i] = self.__vector_components[i] - other.__vector_components[i]
+
+            for i in range(vector_2_length, vector_1_length):
+                difference_vector[i] = self.__vector_components[i]
+
         else:
-            length_difference = vector_2_length - vector_1_length
+            for i in range(vector_2_length):
+                difference_vector.append(0)
 
-            for i in range(length_difference):
-                self.__vector_components.append(0)
+            for i in range(vector_1_length):
+                difference_vector[i] = self.__vector_components[i] - other.__vector_components[i]
 
-        for i, sum_number in enumerate(difference_vector):
-
-            for j, number_1 in enumerate(self.__vector_components):
-                number_1 = self.__vector_components[j]
-
-                for k, number_2 in enumerate(other.__vector_components):
-                    number_2 = other.__vector_components[k]
-
-                    if i == j and j == k:
-                        difference_vector[k] = number_1 - number_2
+            for i in range(vector_1_length, vector_2_length):
+                difference_vector[i] = other.__vector_components[i]
 
         return difference_vector
 
         # e. Умножение вектора на скаляр
+    def __imul__(self, scalar):
+        if not isinstance(scalar, (int, float)):
+            raise TypeError(f"{scalar} не является числом")
 
-    def get_multiplied_vector(self, scalar):
-        for i, item in enumerate(self.__vector_components):
+        vector_length = len(self.__vector_components)
+
+        for i in range(vector_length):
             self.__vector_components[i] *= scalar
 
-        return self.__vector_components
+        return self
 
     # f. Получение и установка компоненты вектора по индексу
-    def get_vector_component(self, index):
-        if index >= len(self.__vector_components) or index < 0:
-            raise ValueError
+    def __getitem__(self, index):
+        if not isinstance(index, int):
+            raise TypeError(f"{index} не является int")
 
-        for i, item in enumerate(self.__vector_components):
-            if i == index:
-                return item
+        vector_length = len(self.__vector_components)
 
-    def change_vector_component(self, index, number):
-        if index >= len(self.__vector_components) or index < 0:
-            raise ValueError
+        if index < 0 or index >= vector_length:
+            raise IndexError(f"Индекс {index} больше или равен длине вектора - {vector_length}")
 
-        for i, item in enumerate(self.__vector_components):
-            if i == index:
-                self.__vector_components[i] = number
+        return self.__vector_components[index]
+
+    def __setitem__(self, index, component):
+        if not isinstance(index, int):
+            raise TypeError(f"{index} не является int")
+
+        if not isinstance(component, (int, float)):
+            raise TypeError(f"{component} не является числом")
+
+        vector_length = len(self.__vector_components)
+
+        if index < 0 or index >= vector_length:
+            raise IndexError(f"Индекс {index} больше или равен длине вектора - {vector_length}")
+
+        self.__vector_components[index] = component
 
         return self.__vector_components
 
     # Нестатический метод: разворот вектора
-    def get_reverse_vector(self):
-        for i, number in enumerate(self.__vector_components):
-            self.__vector_components[i] = (- 1) * number
+    def reverse_vector(self):
+        vector_length = len(self.__vector_components)
 
-        return self.__vector_components
+        for i in range(vector_length):
+            self.__vector_components[i] *= -1
 
-    def scalar_multiplicate_vectors(self, other):
-        vector_1_length = len(self.__vector_components)
-        vector_2_length = len(other.__vector_components)
+        return self
 
-        if vector_1_length > vector_2_length:
-            length_difference = vector_1_length - vector_2_length
+    def __len__(self):
+        return len(self.__vector_components)
 
-            for i in range(length_difference):
-                other.__vector_components.append(0)
-        else:
-            length_difference = vector_2_length - vector_1_length
+    @staticmethod
+    def get_scalar_multiplication(vector_1, vector_2):
+        vector_1_length = len(vector_1)
+        vector_2_length = len(vector_2)
 
-            for i in range(length_difference):
-                self.__vector_components.append(0)
+        max_length = vector_1_length if vector_1_length > vector_2_length else vector_2_length
+        min_length = vector_1_length if vector_1_length <= vector_2_length else vector_2_length
 
-        for i, number_1 in enumerate(self.__vector_components):
-            self.__vector_components[i] = number_1
-            for j, number_2 in enumerate(other.__vector_components):
-                number_2 = other.__vector_components[j]
-                if i == j:
-                    self.__vector_components[i] *= number_2
+        multiplied_vector = []
 
-        return self.__vector_components
+        for i in range(min_length):
+            multiplied_vector.append(vector_1[i] * vector_2[i])
+
+        for i in range(min_length, max_length):
+            multiplied_vector.append(0)
+
+        return multiplied_vector
