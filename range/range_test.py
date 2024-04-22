@@ -25,6 +25,12 @@ test(Range(14, 119), Range(11, 15))
 
 test(Range(1, 7), Range(1, 5))
 
+test(Range(1, 7), Range(1, 9))
+
+test(Range(1, 7), Range(7, 7))
+
+test(Range(7, 7), Range(1, 7))
+
 numbers_range = Range(13, 18)
 
 number_in_range = int(input("Введите число: "))
