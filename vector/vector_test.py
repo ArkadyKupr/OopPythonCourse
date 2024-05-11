@@ -1,13 +1,12 @@
 from vector import Vector
 
-
 vector_1 = Vector([1, 2, 3, 0])
 vector_2 = Vector([1, 2, 3])
 
 vector_3 = Vector(2)
 print("a:", vector_3)
 
-vector_4 = Vector(7, [1, 2, 5, 8])
+vector_4 = Vector(7, [1, 2, 9, 8])
 print("d:", vector_4)
 
 print("Свойство для получения длины вектора:", vector_4.get_length())
@@ -27,7 +26,7 @@ print("Вычитание из вектора другого вектора:", v
 
 vector_1 = Vector([1, 2, 3, 0])
 vector_2 = Vector([1, 2, 4, 0, 0])
-print("Сложение двух векторов с созданием нового:", Vector(vector_1 + vector_2))
+print("Сложение двух векторов с созданием нового:", vector_1 + vector_2)
 print("Вычитание двух векторов с созданием нового:", Vector(vector_1 - vector_2))
 
 vector_1 = Vector([1, 2, 100, 3])
@@ -44,6 +43,10 @@ print("Разворот вектора:", vector_1.reverse_vector())
 print("Вектор:", vector_1)
 print("Вектор:", vector_2)
 
-vector_5 = [1, 9, 0, 10]
-vector_6 = [1, 3, 7]
-print("Скалярное произведение векторов:", Vector(Vector.get_scalar_multiplication(vector_1, vector_2)))
+vector_5 = Vector([1, 9, 0, 10])
+vector_6 = Vector([1, 3, 7])
+print("Скалярное произведение векторов:", Vector.get_scalar_product(vector_5, vector_6))
+
+# проверка на ошибки, связанные с передачей не только чисел
+# vector_7 = Vector(7, [1, 2, 9, 'l'])
+# vector_8 = Vector([1, 2, 9, 'l'])
