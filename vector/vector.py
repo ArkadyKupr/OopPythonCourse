@@ -4,30 +4,24 @@ import copy
 
 
 class Vector:
-    # 1. а) размерность n, все компонены равны нулю
+    # 1. а) размерность - dimension, все компоненты равны нулю
     @dispatch(int)
-    def __init__(self, n):
-        if n <= 0:
-            raise ValueError(f"Длина вектора {n} меньше или равна нулю")
+    def __init__(self, dimension):
+        if not isinstance(dimension, int):
+            raise TypeError(f"Тип {dimension} не является int")
 
-        if not isinstance(n, int):
-            raise TypeError(f"Тип {n} не является int")
+        if dimension <= 0:
+            raise ValueError(f"Размерность вектора должна быть больше нуля, но передана размерность {dimension}")
 
-        self.__vector_components = n * [0]
-        self.__vector_length = n
+        self.__components = dimension * [0]
 
     # 1. b) конструктор копирования
     @dispatch(object)
     def __init__(self, vector):
-        if not isinstance(vector, list):
-            raise TypeError(f"Объект {vector} не является списком")
+        if not isinstance(vector, Vector):
+            raise TypeError(f"Объект {vector} не является объектом класса Vector")
 
-        vector_length = len(vector)
-        self.__vector_length = vector_length
-        self.__vector_components = []
-
-        for i in range(vector_length):
-            self.__vector_components.append(copy.deepcopy(vector[i]))
+        self.__components = copy.copy(vector)
 
     # 1. с) заполнение вектора значениями из списка чисел
     @dispatch(list)
@@ -35,196 +29,132 @@ class Vector:
         if not isinstance(components, list):
             raise TypeError(f"Объект {components} не является списком")
 
-        self.__vector_components = copy.deepcopy(components)
-        self.__vector_length = len(components)
+        components_dimension = len(components)
+
+        for i in range(components_dimension):
+            if not isinstance(components[i], (int, float)):
+                raise TypeError(f"Элементы списка {components} являются не только числами")
+
+        self.__components = copy.copy(components)
 
     # 1. d) заполнение вектора значениями из списка чисел.
-    # Если длина списка меньше n, то считать, что в остальных компонентах 0.
+    # Если длина списка меньше dimension, то считать, что в остальных компонентах 0.
     @dispatch(int, list)
-    def __init__(self, n, components):
-        if n <= 0:
-            raise ValueError(f"Длина вектора {n} меньше или равна нулю")
-
+    def __init__(self, dimension, components):
         if not isinstance(components, list):
             raise TypeError(f"{components} не является списком")
 
-        if not isinstance(n, int):
-            raise TypeError(f"Тип {n} не является int")
+        components_dimension = len(components)
 
-        self.__vector_components = n * [0]
-        self.__vector_length = n
+        for i in range(components_dimension):
+            if not isinstance(components[i], (int, float)):
+                raise TypeError(f"Элементы списка {components} являются не только числами")
 
-        components_length = len(components)
+        if not isinstance(dimension, int):
+            raise TypeError(f"Тип {dimension} не является int")
 
-        for i in range(components_length):
-            self.__vector_components[i] = copy.deepcopy(components[i])
+        if components_dimension < dimension:
+            self.__components = dimension * [0]
+
+            for i in range(components_dimension):
+                self.__components[i] = copy.copy(components[i])
+
+        else:
+            self.__components = components_dimension * [0]
+
+            for i in range(components_dimension):
+                self.__components[i] = copy.copy(components[i])
+
+    def __len__(self):
+        return len(self.__components)
 
     # 2. Свойства для получения размерности вектора и длины вектора
     @property
     def dimension(self):
-        return self.__vector_length
+        return self.__len__()
 
     def get_length(self):
         squared_components_sum = 0
 
-        for component in self.__vector_components:
+        for component in self.__components:
             squared_components_sum += component * component
 
         return math.sqrt(squared_components_sum)
 
     # 3. Реализовать метод __repr__, чтобы выдавал информацию о векторе в формате (значения компонент через запятую)
     # Например, {1, 2, 3}
+    @staticmethod
+    def copy(component):
+        return str(copy.copy(component))
+
     def __repr__(self):
-        vector = []
+        strings_list = map(self.copy, self.__components)
 
-        for i, number in enumerate(self.__vector_components):
-            vector.append(str(number))
-
-        return "{" + ", ".join(vector) + "}"
+        return "{" + ", ".join(strings_list) + "}"
 
     # g. Переопределить метод __eq__, чтобы было True - векторы имеют одинаковую размерность и соответствующие
     # компоненты равны
     def __eq__(self, other):
-        if not isinstance(other, type(self)):
-            return NotImplemented
-
-        return self.__vector_components == other.__vector_components
+        return self.__components == other.__components
 
     def __hash__(self):
-        return hash(tuple(self.__vector_components))
+        return hash(tuple(self.__components))
 
     # 4. Реализовать операторы:
     # a. Прибавление к вектору другого вектора
     def __iadd__(self, other):
-        if not isinstance(self.__vector_components, list):
-            raise TypeError(f"{self.__vector_components} не является вектором")
+        vector_1_dimension = len(self.__components)
+        vector_2_dimension = len(other.__components)
 
-        if not isinstance(other.__vector_components, list):
-            raise TypeError(f"{self.__vector_components} не является вектором")
+        if vector_1_dimension <= vector_2_dimension:
+            dimensions_difference = vector_2_dimension - vector_1_dimension
 
-        vector_1_length = len(self.__vector_components)
-        vector_2_length = len(other.__vector_components)
+            for i in range(dimensions_difference):
+                self.__components.append(0)
 
-        if vector_1_length > vector_2_length:
-            for i in range(vector_2_length):
-                self.__vector_components[i] += other.__vector_components[i]
-
-        else:
-            lengths_difference = vector_2_length - vector_1_length
-
-            for i in range(lengths_difference):
-                self.__vector_components.append(0)
-
-            for i in range(vector_2_length):
-                self.__vector_components[i] += other.__vector_components[i]
+        for i in range(vector_1_dimension):
+            self.__components[i] += other.__components[i]
 
         return self
 
     # b. Вычитание из вектора другого вектора
     def __isub__(self, other):
-        if not isinstance(self.__vector_components, list):
-            raise TypeError(f"{self.__vector_components} не является вектором")
+        vector_1_dimension = len(self.__components)
+        vector_2_dimension = len(other.__components)
 
-        if not isinstance(other.__vector_components, list):
-            raise TypeError(f"{self.__vector_components} не является вектором")
+        if vector_1_dimension <= vector_2_dimension:
+            dimensions_difference = vector_2_dimension - vector_1_dimension
 
-        vector_1_length = len(self.__vector_components)
-        vector_2_length = len(other.__vector_components)
+            for i in range(dimensions_difference):
+                self.__components.append(0)
 
-        if vector_1_length > vector_2_length:
-            for i in range(vector_2_length):
-                self.__vector_components[i] -= other.__vector_components[i]
-
-        else:
-            lengths_difference = vector_2_length - vector_1_length
-
-            for i in range(lengths_difference):
-                self.__vector_components.append(0)
-
-            for i in range(vector_2_length):
-                self.__vector_components[i] -= other.__vector_components[i]
+        for i in range(vector_1_dimension):
+            self.__components[i] -= other.__components[i]
 
         return self
 
     # с. Сложение двух векторов - должен создаваться новый вектор
     def __add__(self, other):
-        if not isinstance(self.__vector_components, list):
-            raise TypeError(f"{self.__vector_components} не является вектором")
-
-        if not isinstance(other.__vector_components, list):
-            raise TypeError(f"{self.__vector_components} не является вектором")
-
-        vector_1_length = len(self.__vector_components)
-        vector_2_length = len(other.__vector_components)
-
-        sum_vector = []
-
-        if vector_1_length > vector_2_length:
-            for i in range(vector_1_length):
-                sum_vector.append(0)
-
-            for i in range(vector_2_length):
-                sum_vector[i] = self.__vector_components[i] + other.__vector_components[i]
-
-            for i in range(vector_2_length, vector_1_length):
-                sum_vector[i] = self.__vector_components[i]
-
-        else:
-            for i in range(vector_2_length):
-                sum_vector.append(0)
-
-            for i in range(vector_1_length):
-                sum_vector[i] = self.__vector_components[i] + other.__vector_components[i]
-
-            for i in range(vector_1_length, vector_2_length):
-                sum_vector[i] = other.__vector_components[i]
-
+        sum_vector = copy.deepcopy(self)
+        Vector.__iadd__(sum_vector, other)
         return sum_vector
 
     # d. Вычитание векторов - должен создаваться новый вектор
     def __sub__(self, other):
-        if not isinstance(self.__vector_components, list):
-            raise TypeError(f"{self.__vector_components} не является вектором")
-
-        if not isinstance(other.__vector_components, list):
-            raise TypeError(f"{self.__vector_components} не является вектором")
-
-        vector_1_length = len(self.__vector_components)
-        vector_2_length = len(other.__vector_components)
-
-        difference_vector = []
-
-        if vector_1_length > vector_2_length:
-            for i in range(vector_1_length):
-                difference_vector.append(0)
-
-            for i in range(vector_2_length):
-                difference_vector[i] = self.__vector_components[i] - other.__vector_components[i]
-
-            for i in range(vector_2_length, vector_1_length):
-                difference_vector[i] = self.__vector_components[i]
-
-        else:
-            for i in range(vector_2_length):
-                difference_vector.append(0)
-
-            for i in range(vector_1_length):
-                difference_vector[i] = self.__vector_components[i] - other.__vector_components[i]
-
-            for i in range(vector_1_length, vector_2_length):
-                difference_vector[i] = other.__vector_components[i]
-
+        difference_vector = copy.deepcopy(self)
+        Vector.__isub__(difference_vector, other)
         return difference_vector
 
         # e. Умножение вектора на скаляр
+
     def __imul__(self, scalar):
         if not isinstance(scalar, (int, float)):
             raise TypeError(f"{scalar} не является числом")
 
-        vector_length = len(self.__vector_components)
+        length = len(self.__components)
 
-        for i in range(vector_length):
-            self.__vector_components[i] *= scalar
+        for i in range(length):
+            self.__components[i] *= scalar
 
         return self
 
@@ -233,55 +163,50 @@ class Vector:
         if not isinstance(index, int):
             raise TypeError(f"{index} не является int")
 
-        vector_length = len(self.__vector_components)
+        if index < 0:
+            raise IndexError(f"Индекс {index} должен быть равен или больше 0")
 
-        if index < 0 or index >= vector_length:
-            raise IndexError(f"Индекс {index} больше или равен длине вектора - {vector_length}")
+        dimension = len(self.__components)
 
-        return self.__vector_components[index]
+        if index >= dimension:
+            raise IndexError(f"Индекс {index} равен или больше размерности вектора - {dimension}")
+
+        return self.__components[slice(index, index + 1)][0]
 
     def __setitem__(self, index, component):
         if not isinstance(index, int):
             raise TypeError(f"{index} не является int")
 
-        if not isinstance(component, (int, float)):
-            raise TypeError(f"{component} не является числом")
+        if index < 0:
+            raise IndexError(f"Индекс {index} должен быть равен или больше 0")
 
-        vector_length = len(self.__vector_components)
+        dimension = len(self.__components)
 
-        if index < 0 or index >= vector_length:
-            raise IndexError(f"Индекс {index} больше или равен длине вектора - {vector_length}")
+        if index >= dimension:
+            raise IndexError(f"Индекс {index} равен или больше размерности вектора - {dimension}")
 
-        self.__vector_components[index] = component
-
-        return self.__vector_components
+        self.__components[index] = component
 
     # Нестатический метод: разворот вектора
     def reverse_vector(self):
-        vector_length = len(self.__vector_components)
-
-        for i in range(vector_length):
-            self.__vector_components[i] *= -1
-
-        return self
-
-    def __len__(self):
-        return len(self.__vector_components)
+        return Vector.__imul__(self, -1)
 
     @staticmethod
-    def get_scalar_multiplication(vector_1, vector_2):
-        vector_1_length = len(vector_1)
-        vector_2_length = len(vector_2)
+    def get_scalar_product(vector_1, vector_2):
+        if not isinstance(vector_1, Vector):
+            raise TypeError(f"Объект {vector_1} не является объектом класса Vector")
 
-        max_length = vector_1_length if vector_1_length > vector_2_length else vector_2_length
-        min_length = vector_1_length if vector_1_length <= vector_2_length else vector_2_length
+        if not isinstance(vector_2, Vector):
+            raise TypeError(f"Объект {vector_2} не является объектом класса Vector")
 
-        multiplied_vector = []
+        vector_1_dimension = len(vector_1)
+        vector_2_dimension = len(vector_2)
 
-        for i in range(min_length):
-            multiplied_vector.append(vector_1[i] * vector_2[i])
+        min_dimension = min(vector_1_dimension, vector_2_dimension)
 
-        for i in range(min_length, max_length):
-            multiplied_vector.append(0)
+        scalar_product = 0
 
-        return multiplied_vector
+        for i in range(min_dimension):
+            scalar_product += vector_1[i] * vector_2[i]
+
+        return scalar_product
