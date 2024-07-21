@@ -1,324 +1,356 @@
 from multipledispatch import dispatch
 import copy
+from vector.vector import Vector
 
 
 class Matrix:
-    # 1. а) Конструктор: матрица нулей m x n
+    # 1. а) Конструктор: матрица нулей m x n, где m - rows, а n - columns
     @dispatch(int, int)
-    def __init__(self, n, m):
-        if n <= 0 or m <= 0:
-            raise ValueError
+    def __init__(self, rows, columns):
+        if not isinstance(rows, int):
+            raise TypeError(f"Тип {rows} не является int")
 
-        matrix = []
+        if rows <= 0:
+            raise ValueError("Количество строк должно быть больше нуля")
 
-        for i in range(n):
-            matrix.append(m * [0])
+        if not isinstance(columns, int):
+            raise TypeError(f"Тип {columns} не является int")
 
-        self.__matrix = matrix
+        if columns <= 0:
+            raise ValueError("Количество столбцов должно быть больше нуля")
 
-    # 1. b) Конструктор: конструктор копирования
-    @dispatch(list)
-    def __init__(self, matrix):
-        self.__matrix = copy.deepcopy(matrix)
+        self.__rows_list = []
+
+        for i in range(rows):
+            self.__rows_list.append(Vector(columns))
+
+    # 1. b) Конструктор: конструктор копирования с проверкой, что передан объект
+    @dispatch(object)
+    def __init__(self, rows_list):
+        if not isinstance(rows_list, Matrix):
+            raise TypeError(f"Объект {rows_list} не является объектом класса Matrix")
+
+        self.__rows_list = copy.deepcopy(rows_list)
 
     # 1. с) Конструктор: из двумерного списка чисел
-    @dispatch((list, float, float))
-    def __init__(self, elements):
-        self.__matrix = elements
-
     # 1. d) Конструктор: из списка векторов-строк
-    @dispatch(list, str)
-    def __init__(self, vectors):
-        for word in vectors:
-            int(word.split(", "))
+    @dispatch(list)
+    def __init__(self, elements):
+        if not isinstance(elements, list):
+            raise TypeError(f"Тип {elements} не является list")
 
-        self.__matrix = vectors
+        elements_quantity = len(elements)
+
+        if isinstance(elements[0], list):
+            # Проверка, что все элементы из двумерного списка имеют тип list
+            for i in range(1, elements_quantity):
+                if not isinstance(elements[i], list):
+                    raise TypeError(f"Тип одного из элементов не является list. Однако, тип всех элементов"
+                                    f" должен быть list")
+
+            # Проверка, что все элементы-списки одного размера
+            previous_element_length = len(elements[0])
+
+            for i, element in enumerate(elements):
+                if len(element) != previous_element_length:
+                    raise ValueError(f"Длины двух строк: {i - 1} и {i}, не равны")
+
+                previous_element_length = len(elements[i])
+
+            self.__rows_list = []
+
+            for i in range(elements_quantity):
+                self.__rows_list.append(Vector(copy.deepcopy(elements[i])))
+
+        elif isinstance(elements[0], Vector):
+            # Проверка, что все элементы из двумерного списка имеют тип Vector
+            for i in range(1, elements_quantity):
+                if not isinstance(elements[i], Vector):
+                    raise TypeError(f"Один из элементов списка не является объектом Vector. Однако, все элементы"
+                                    f" должены быть объектами Vector")
+
+            # Проверка, что все объекты Vector одного размера
+            previous_element_length = len(elements[0])
+
+            for i, element in enumerate(elements):
+                if len(element) != previous_element_length:
+                    raise ValueError(f"Длины двух векторов: {i - 1} и {i}, не равны")
+
+                previous_element_length = len(elements[i])
+
+            self.__rows_list = copy.deepcopy(elements)
+
+        else:
+            raise TypeError(f"Тип первого элемента списка не является ни list, ни объектом Vector")
 
     # 2. Свойства: получение размеров матрицы
     @property
-    def matrix_dimensions(self):
-        n = len(self.__matrix)
+    def rows_quantity(self):
+        return len(self.__rows_list)
 
-        current_row = 0
-        current_m = 0
-
-        while current_row < n:
-            if current_m < len(self.__matrix[current_row]):
-                current_m = len(self.__matrix[current_row])
-
-            current_row += 1
-
-        m = current_m
-
-        return n, m
+    @property
+    def columns_quantity(self):
+        return len(self.__rows_list[0])
 
     # 3. а) Получение и задание вектора-строки по индексу
-    def get_string_vector(self, index):
-        if index >= len(self.__matrix):
-            raise ValueError
+    def __getitem__(self, index):
+        if not isinstance(index, int):
+            raise TypeError(f"Тип {index} должен быть int")
 
-        return self.__matrix[index]
+        rows_quantity = len(self.__rows_list)
 
-    def set_string_vector(self, vector, index):
-        if index >= len(self.__matrix):
-            raise ValueError
+        if index < 0 or index >= rows_quantity:
+            raise IndexError(f"Заданный индекс вектора-строки:{index}, должен быть в диапазоне: "
+                             f"[0, {rows_quantity - 1}]")
 
-        matrix_width = len(self.__matrix[0])
+        return copy.deepcopy(self.__rows_list[slice(index, index + 1)][0])
 
-        if len(vector) != matrix_width:
-            raise ValueError
+    # 4. а) Получение вектора-столбца по индексу:
+    def get_column(self, index):
+        if not isinstance(index, int):
+            raise TypeError(f"Тип {index} должен быть int")
 
-        for i in range(matrix_width):
-            self.__matrix[index][i] = vector[i]
+        rows_quantity = len(self.__rows_list)
+        columns_quantity = len(self.__rows_list[0])
 
-        return self.__matrix
+        if index < 0 or index >= columns_quantity:
+            raise IndexError(f"Заданный индекс вектора-столбца:{index}, должен быть в диапазоне: "
+                             f"[0, {columns_quantity - 1}]")
+
+        column_vector = []
+
+        for i in range(rows_quantity):
+            column_vector.append(self.__rows_list[i][index])
+
+        return Vector(column_vector)
+
+    def __len__(self):
+        return len(self.__rows_list)
+
+    def __setitem__(self, index, component):
+        if not isinstance(index, int):
+            raise TypeError(f"Тип {index} должен быть int")
+
+        rows_quantity = len(self.__rows_list)
+
+        if index < 0 or index >= rows_quantity:
+            raise IndexError(f"Заданный индекс вектора-строки:{index}, должен быть в диапазоне: "
+                             f"[0, {rows_quantity - 1}]")
+
+        self.__rows_list[index] = Vector(copy.deepcopy(component))
 
     # 3. b) Умножение на скаляр
-    def get_multiplied_matrix(self, scalar):
-        matrix_length = len(self.__matrix)
-        matrix_width = len(self.__matrix[0])
+    def __imul__(self, scalar):
+        rows_quantity = len(self.__rows_list)
 
-        for i in range(matrix_length):
-            for j in range(matrix_width):
-                self.__matrix[i][j] *= scalar
+        for i in range(rows_quantity):
+            self.__rows_list[i] *= scalar
 
-        return self.__matrix
+        return self
+
+    # Сравнение размерностей двух матриц и бросание исключения
+    def raise_exception(self, other):
+        rows_quantity_1 = len(self.__rows_list)
+        columns_quantity_1 = len(self.__rows_list[0])
+
+        rows_quantity_2 = len(other.__rows_list)
+        columns_quantity_2 = len(other.__rows_list[0])
+
+        if rows_quantity_1 != rows_quantity_2 or columns_quantity_1 != columns_quantity_2:
+            raise ValueError(f"Размеры двух матриц: первой матрицы {rows_quantity_1}x{columns_quantity_1} и "
+                             f"второй - {rows_quantity_2}x{columns_quantity_2}, не равны")
 
     # 3. c) Прибавление к матрице другой матрицы:
-    def summarize(self, other):
-        matrix_1_length = len(self.__matrix)
-        matrix_1_width = len(self.__matrix[0])
+    def __iadd__(self, other):
+        self.raise_exception(other)
 
-        matrix_2_length = len(other.__matrix)
-        matrix_2_width = len(other.__matrix[0])
+        rows_quantity_1 = len(self.__rows_list)
 
-        if matrix_1_length != matrix_2_length and matrix_1_width != matrix_2_width:
-            raise ValueError
+        for i in range(rows_quantity_1):
+            self.__rows_list[i] += other.__rows_list[i]
 
-        for i in range(matrix_1_length):
-            for j in range(matrix_1_width):
-                self.__matrix[i][j] += other.__matrix[i][j]
-
-        return self.__matrix
+        return self
 
     # 3. d) Вычитание из матрицы другой матрицы:
-    def subtract(self, other):
-        matrix_1_length = len(self.__matrix)
-        matrix_1_width = len(self.__matrix[0])
+    def __isub__(self, other):
+        self.raise_exception(other)
 
-        matrix_2_length = len(other.__matrix)
-        matrix_2_width = len(other.__matrix[0])
+        rows_quantity_1 = len(self.__rows_list)
 
-        if matrix_1_length != matrix_2_length and matrix_1_width != matrix_2_width:
-            raise ValueError
+        for i in range(rows_quantity_1):
+            self.__rows_list[i] -= other.__rows_list[i]
 
-        for i in range(matrix_1_length):
-            for j in range(matrix_1_width):
-                self.__matrix[i][j] -= other.__matrix[i][j]
-
-        return self.__matrix
+        return self
 
     # 3. e) Прибавление к матрице другой матрицы:
-    def get_sum_matrix(self, other):
-        matrix_1_length = len(self.__matrix)
-        matrix_1_width = len(self.__matrix[0])
+    def __add__(self, other):
+        self.raise_exception(other)
 
-        matrix_2_length = len(other.__matrix)
-        matrix_2_width = len(other.__matrix[0])
-
-        if matrix_1_length != matrix_2_length and matrix_1_width != matrix_2_width:
-            raise ValueError
-
-        sum_matrix = []
-
-        for i in range(matrix_1_length):
-            sum_matrix.append(matrix_1_width * [0])
-
-        for i in range(matrix_1_length):
-            for j in range(matrix_1_width):
-                sum_matrix[i][j] = self.__matrix[i][j] + other.__matrix[i][j]
-
-        return sum_matrix
+        summary = copy.deepcopy(self)
+        Matrix.__iadd__(summary, other)
+        return summary
 
     # 3. f) Вычитание матриц:
-    def get_subtracted_matrix(self, other):
-        matrix_1_length = len(self.__matrix)
-        matrix_1_width = len(self.__matrix[0])
+    def __sub__(self, other):
+        self.raise_exception(other)
 
-        matrix_2_length = len(other.__matrix)
-        matrix_2_width = len(other.__matrix[0])
-
-        if matrix_1_length != matrix_2_length and matrix_1_width != matrix_2_width:
-            raise ValueError
-
-        subtracted_matrix = []
-
-        for i in range(matrix_1_length):
-            subtracted_matrix.append(matrix_1_width * [0])
-
-        for i in range(matrix_1_length):
-            for j in range(matrix_1_width):
-                subtracted_matrix[i][j] = self.__matrix[i][j] - other.__matrix[i][j]
-
-        return subtracted_matrix
+        subtraction = copy.deepcopy(self)
+        Matrix.__isub__(subtraction, other)
+        return subtraction
 
     # 3. g) Умножение матриц:
-    def get_multiplication(self, other):
-        matrix_1_length = len(self.__matrix)
-        matrix_2_length = len(other.__matrix)
+    def __mul__(self, other):
+        rows_quantity_1 = len(self.__rows_list)
+        rows_quantity_2 = len(other.__rows_list)
+        columns_quantity_1 = len(self.__rows_list[0])
+        columns_quantity_2 = len(other.__rows_list[0])
 
-        multiplication_matrix = []
+        # Проверка размеров матриц в соответствии с правилами умножения матриц
+        if columns_quantity_1 != rows_quantity_2:
+            raise ValueError(f"Количество строк первой матрицы {rows_quantity_1}x{columns_quantity_1} должно "
+                             f"быть равно количеству столбцов второй - {rows_quantity_2}x{columns_quantity_2}")
 
-        for i in range(matrix_1_length):
-            multiplication_matrix.append(matrix_1_length * [0])
+        multiplication_product = [0] * rows_quantity_1
 
-        for i in range(matrix_1_length):
-            for j in range(matrix_1_length):
-                for k in range(matrix_2_length):
-                    multiplication_matrix[i][j] += self.__matrix[i][k] * other.__matrix[k][j]
+        for i in range(rows_quantity_1):
+            multiplication_product[i] = [0] * columns_quantity_2
 
-        return multiplication_matrix
+        for i in range(rows_quantity_1):
+            for j in range(columns_quantity_2):
+                for k in range(rows_quantity_2):
+                    multiplication_product[i][j] += self.__rows_list[i][k] * other.__rows_list[k][j]
+
+        return Matrix(multiplication_product)
 
     # 3. h) Умножение матрицы на вектор-столбец:
-    def get_multiplication_vector(self, vector):
-        matrix_length = len(self.__matrix)
-        matrix_width = len(self.__matrix[0])
+    def multiply_by_vector(self, vector):
+        if not isinstance(vector, Vector):
+            raise TypeError(f"Объект {vector} не является объектом класса Vector")
+
+        rows_quantity = len(self.__rows_list)
+        columns_quantity = len(self.__rows_list[0])
 
         vector_length = len(vector)
 
-        multiplied_vector = []
+        if vector_length != columns_quantity:
+            raise ValueError(f"Длина вектора {vector}: {vector_length}, должна "
+                             f"быть равна количеству столбцов матрицы - {self}: {columns_quantity}")
 
-        for i in range(matrix_length):
-            multiplied_vector.append(0)
+        resulted_vector = []
 
-        if vector_length != matrix_width:
-            raise ValueError
+        for i in range(rows_quantity):
+            resulted_vector.append(0)
 
-        for i in range(matrix_length):
-            for j in range(matrix_width):
-                multiplied_vector[i] += self.__matrix[i][j] * vector[j]
+        for i in range(rows_quantity):
+            for j in range(columns_quantity):
+                resulted_vector[i] += self.__rows_list[i][j] * vector[j]
 
-        return multiplied_vector
+        return Vector(resulted_vector)
 
     # 3. i) Переопределить методы __eq__ и __hash__:
     def __eq__(self, other):
-        if other.__matrix.__hash__ != self.__matrix.__hash__:
+        if not isinstance(other, Matrix):
+            raise TypeError(f"Объект {other} не является объектом класса Matrix")
+
+        self.raise_exception(other)
+
+        if other.__rows_list.__hash__ != self.__rows_list.__hash__:
             return False
 
-        matrix_1_length = len(self.__matrix)
-        matrix_2_length = len(other.__matrix)
+        rows_quantity_1 = len(self.__rows_list)
+        rows_quantity_2 = len(other.__rows_list)
 
-        matrix_1_width = len(self.__matrix[0])
-        matrix_2_width = len(other.__matrix[0])
+        columns_quantity_1 = len(self.__rows_list[0])
+        columns_quantity_2 = len(other.__rows_list[0])
 
-        if matrix_1_length == matrix_2_length and matrix_1_width == matrix_2_width:
-            for i in range(matrix_1_length):
-                for j in range(matrix_1_width):
-                    if self.__matrix[i][j] != other.__matrix[i][j]:
+        if rows_quantity_1 != rows_quantity_2 or columns_quantity_1 != columns_quantity_2:
+            return False
+        else:
+            for i in range(rows_quantity_1):
+                for j in range(columns_quantity_1):
+                    if self.__rows_list[i][j] != other.__rows_list[i][j]:
                         return False
 
             return True
 
-        return False
-
     def __hash__(self):
-        return hash(self.__matrix)
+        return hash(tuple(self.__rows_list))
 
     # 4. d) Метод __repr__ определить, чтобы результат был в виде: {{1, 2}, {2, 3}}
     def __repr__(self):
-        quantity = len(self.__matrix)
+        rows_quantity = len(self.__rows_list)
+        strings_lists = ""
 
-        numbers_string = "{"
+        for i in range(rows_quantity):
+            strings_lists += (Vector.__repr__(copy.copy(self.__rows_list[i])))
 
-        for i, vector in enumerate(self.__matrix):
-            vector_size = len(self.__matrix[i])
+            if i != rows_quantity - 1:
+                strings_lists += ", "
 
-            numbers_string += "{"
-
-            for j, vector_item in enumerate(self.__matrix[i]):
-                numbers_string += str(vector_item)
-
-                if j != vector_size - 1:
-                    numbers_string += ", "
-                else:
-                    numbers_string += "}"
-
-            if i != quantity - 1:
-                numbers_string += ", "
-
-        numbers_string += "}"
-
-        return f"{numbers_string}"
-
-    # 4. а) Получение вектора-столбца по индексу:
-    def get_column_vector(self, index):
-        n = len(self.__matrix)
-        m = len(self.__matrix[0])
-
-        if index >= m:
-            raise ValueError
-
-        column_vector = []
-
-        for i in range(n):
-            column_vector.append(self.__matrix[i][index])
-
-        return column_vector
+        return "{" + f"{strings_lists}" + "}"
 
     # 4. b) Транспонирование матрицы:
     def transpose(self):
-        n = len(self.__matrix)
-        m = len(self.__matrix[0])
+        rows_quantity = len(self.__rows_list)
+        columns_quantity = len(self.__rows_list[0])
 
         multiplication_matrix = []
 
-        for i in range(m):
-            multiplication_matrix.append(n * [0])
+        for i in range(columns_quantity):
+            multiplication_matrix.append(rows_quantity * [0])
 
-        for i in range(n):
-            for j in range(m):
-                multiplication_matrix[j][i] = self.__matrix[i][j]
+        for i in range(rows_quantity):
+            for j in range(columns_quantity):
+                multiplication_matrix[j][i] = self.__rows_list[i][j]
 
-        return multiplication_matrix
+        self.__rows_list = Matrix(multiplication_matrix)
+
+    # Вычисление определителя матриц 1х1 и 2х2
+    def get_determinant_of_small_matrix(self, columns_quantity):
+        if columns_quantity == 1:
+            return self.__rows_list[0][0]
+
+        if columns_quantity == 2:
+            return self.__rows_list[0][0] * self.__rows_list[1][1] - self.__rows_list[1][0] * self.__rows_list[0][1]
 
     # 4. c) Вычисление определителя матрицы:
-    def calculate_determinant(self):
-        m = len(self.__matrix)
-        n = len(self.__matrix[0])
+    def get_determinant(self):
+        rows_quantity = len(self.__rows_list)
+        columns_quantity = len(self.__rows_list[0])
 
-        if n == 0 or m == 0 or n != m:
-            raise ValueError
+        if columns_quantity != rows_quantity:
+            raise IndexError(f"Количество строк матрицы должно быть равно количеству столбцов. "
+                             f"Сейчас размеры матрицы: {rows_quantity}x{columns_quantity}")
 
-        if n == 1:
-            return self.__matrix[0][0]
-        if n == 2:
-            return self.__matrix[0][0] * self.__matrix[1][1] - self.__matrix[1][0] * self.__matrix[0][1]
+        self.get_determinant_of_small_matrix(columns_quantity)
 
-        def calculate_determinant_1(matrix):
+        def get_inner_determinant(matrix):
             size = len(matrix[0])
 
             if size == 1:
                 return matrix[0][0]
-            elif size == 2:
+
+            if size == 2:
                 return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
-            else:
+
+            if size > 2:
                 determinant = 0
 
                 for k in range(size):
-                    intermediate_matrix = []
+                    minor = []
 
                     for i in range(size - 1):
-                        intermediate_matrix.append((size - 1) * [0])
+                        minor.append((size - 1) * [0])
 
                     for i in range(1, size):
                         for j in range(0, k):
-                            intermediate_matrix[i - 1][j] = matrix[i][j]
+                            minor[i - 1][j] = matrix[i][j]
 
                         for j in range(k + 1, size):
-                            intermediate_matrix[i - 1][j - 1] = matrix[i][j]
+                            minor[i - 1][j - 1] = matrix[i][j]
 
-                    determinant += pow(-1, k) * matrix[0][k] * calculate_determinant_1(intermediate_matrix)
+                    determinant += pow(-1, k) * matrix[0][k] * get_inner_determinant(minor)
 
                 return determinant
 
-        return calculate_determinant_1(self.__matrix)
+        return get_inner_determinant(self.__rows_list)
