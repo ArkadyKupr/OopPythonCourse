@@ -1,5 +1,5 @@
 from matrix import Matrix
-from vector.vector import Vector
+from vector_task.vector import Vector
 
 print("# 1. a) Конструктор: матрица нулей m x n, где m - rows, а n - columns:")
 user_matrix_1 = Matrix(1, 3)

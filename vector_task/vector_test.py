@@ -1,4 +1,4 @@
-from vector import Vector
+from vector_task.vector import Vector
 
 vector_1 = Vector([1, 2, 3, 0])
 vector_2 = Vector([1, 2, 3])
@@ -27,18 +27,18 @@ print("Вычитание из вектора другого вектора:", v
 vector_1 = Vector([1, 2, 3, 0])
 vector_2 = Vector([1, 2, 4, 0, 0])
 print("Сложение двух векторов с созданием нового:", vector_1 + vector_2)
-print("Вычитание двух векторов с созданием нового:", Vector(vector_1 - vector_2))
+print("Вычитание двух векторов с созданием нового:", vector_1 - vector_2)
 
 vector_1 = Vector([1, 2, 100, 3])
 vector_1 *= -1
 print("Умножение вектора на скаляр:", vector_1)
 
-print("Получение компоненты вектора по индексу:", vector_1[1])
+print("Получение компоненты вектора по индексу:", vector_1[3])
 
-vector_1[1] = 100
+vector_1[-3] = 100
 print("Установка компоненты вектора по индексу:", vector_1)
 
-print("Разворот вектора:", vector_1.reverse_vector())
+print("Разворот вектора:", vector_1.reverse())
 
 print("Вектор:", vector_1)
 print("Вектор:", vector_2)
@@ -46,7 +46,3 @@ print("Вектор:", vector_2)
 vector_5 = Vector([1, 9, 0, 10])
 vector_6 = Vector([1, 3, 7])
 print("Скалярное произведение векторов:", Vector.get_scalar_product(vector_5, vector_6))
-
-# проверка на ошибки, связанные с передачей не только чисел
-# vector_7 = Vector(7, [1, 2, 9, 'l'])
-# vector_8 = Vector([1, 2, 9, 'l'])

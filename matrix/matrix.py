@@ -1,6 +1,6 @@
 from multipledispatch import dispatch
 import copy
-from vector.vector import Vector
+from vector_task.vector import Vector
 
 
 class Matrix:

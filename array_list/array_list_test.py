@@ -10,11 +10,20 @@ print(user_array_list)
 user_array_list.append(2)
 print(user_array_list)
 
+# проверка метода ensure_capacity
 user_array_list.ensure_capacity(9)
 print(user_array_list)
 
+# проверка метода trim_to_size
 user_array_list.trim_to_size()
-
 print(user_array_list)
 
-next(user_array_list)
+# реализация класса как итератора
+iterator = iter(user_array_list)
+print(next(iterator))
+print(next(iterator))
+print(next(iterator))
+print(next(iterator))
+
+# проверка метода extend
+user_array_list.extend([1, 1, 2])

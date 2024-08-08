@@ -84,15 +84,20 @@ class ArrayList:
 
             self.__items = trimmed_list
 
+    def extend(self, components):
+        if not isinstance(components, list):
+            raise TypeError(f"Тип {components} должен быть list")
+
+        items_length = len(components)
+
+        for i in range(items_length):
+            self.append(int(copy.copy(components[i])))
+
     def __iter__(self):
         for i in range(self.__size):
             yield self.__items[i]
 
-    @staticmethod
-    def copy(item):
-        return str(copy.copy(item))
-
     def __repr__(self):
-        strings_array_list = map(self.copy, self.__items)
+        strings_array_list = map(lambda x: str(copy.copy(x)), self.__items)
 
         return "[" + ", ".join(strings_array_list) + "]"
