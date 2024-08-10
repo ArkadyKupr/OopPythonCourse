@@ -10,12 +10,17 @@ class ArrayList:
                 raise TypeError(f"Тип {capacity} должен быть int")
 
             if capacity < 0:
-                raise ValueError(f"{capacity} должен быть больше нуля")
+                raise ValueError(f"{capacity} должен быть больше нуля. Передано значение: {capacity}")
 
             self.__capacity = capacity
 
         self.__items = [None] * self.__capacity
         self.__size = 0
+
+    # свойство для получения размерности списка на массиве
+    @property
+    def size(self):
+        return self.__size
 
     def __len__(self):
         return self.__size
@@ -24,8 +29,8 @@ class ArrayList:
         if not isinstance(item, int):
             raise TypeError(f"Тип {item} должен быть int")
 
-        if item < 0 or item > self.__size:
-            raise ValueError(f"{item} должен лежать в пределе [0, {self.__size}]")
+        if item < 0 or item > self.size:
+            raise ValueError(f"{item} должен лежать в пределе [0, {self.size}]")
 
     def __getitem__(self, item):
         self.check(item)
@@ -42,18 +47,18 @@ class ArrayList:
     def pop(self, index):
         self.check(index)
 
-        if index < self.__size - 1:
-            for i in range(index, self.__size):
+        if index < self.size - 1:
+            for i in range(index, self.size):
                 self.__items[i] = self.__items[i + 1]
 
-        self.__items[self.__size - 1] = None
+        self.__items[self.size - 1] = None
         self.__size -= 1
 
     def append(self, element):
-        if self.__size >= len(self.__items):
+        if self.size >= len(self.__items):
             self.increase_capacity()
 
-        self.__items[self.__size] = element
+        self.__items[self.size] = element
         self.__size += 1
 
     def increase_capacity(self):

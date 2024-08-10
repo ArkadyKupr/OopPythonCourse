@@ -1,4 +1,4 @@
-from array_list import ArrayList
+from array_list_task.array_list import ArrayList
 
 user_array_list = ArrayList(3)
 

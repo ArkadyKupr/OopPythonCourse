@@ -1,4 +1,4 @@
-from singly_linked_list import SinglyLinkedList
+from list_task.singly_linked_list import SinglyLinkedList
 
 # Создаем и заполняем односвязный список
 user_list = SinglyLinkedList()

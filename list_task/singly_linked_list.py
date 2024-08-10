@@ -1,4 +1,4 @@
-from list_item import ListItem
+from list_task.list_item import ListItem
 
 
 class SinglyLinkedList:

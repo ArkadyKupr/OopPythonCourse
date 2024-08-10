@@ -1,4 +1,4 @@
-from matrix import Matrix
+from matrix_task.matrix import Matrix
 from vector_task.vector import Vector
 
 print("# 1. a) Конструктор: матрица нулей m x n, где m - rows, а n - columns:")
@@ -12,12 +12,12 @@ print(user_matrix_2)
 print()
 
 print("# 1. с) Конструктор: из двумерного списка чисел:")
-user_matrix_3 = Matrix([[1, 2], [3, 6], [5, 7]])
+user_matrix_3 = Matrix([[1, 2, 0, 0], [3, 6], [5, 7], [0]])
 print(user_matrix_3)
 print()
 
 print("# 1. d) Конструктор: из списка векторов-строк:")
-user_matrix_4 = Matrix([Vector([1, 9, 0, 10]), Vector([1, 9, 0, 10]), Vector([1, 9, 0, 10]), Vector([1, 9, 0, 10])])
+user_matrix_4 = Matrix([Vector([1, 9, 0, 10, 0, 9, 10]), Vector([1, 9, 0, 10]), Vector([1, 9, 0, 10]), Vector([1, 9, 0, 10])])
 print(user_matrix_4)
 print()
 
@@ -27,11 +27,13 @@ print("Количество столбцов:", user_matrix_1.columns_quantity)
 print()
 
 print("# 3. а) Получение и задание вектора-строки по индексу:")
-print("Получение вектора-строки по индексу:", user_matrix_4[3])
+print("Получение вектора-строки по индексу:", user_matrix_4[-4])
 print()
 
+print("Получение вектора-столбца по индексу:", user_matrix_4.get_column(-7))
+
 user_matrix_1[0] = [0, 1]
-user_matrix_4[0] = [0, 1, 6, 7]
+user_matrix_4[-4] = [0, 1, 6, 7]
 print("Задание вектора-строки по индексу:", user_matrix_1)
 print("Задание вектора-строки по индексу:", user_matrix_4)
 print()
