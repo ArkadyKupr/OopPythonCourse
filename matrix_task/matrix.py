@@ -1,5 +1,4 @@
 from multipledispatch import dispatch
-import copy
 from vector_task.vector import Vector
 
 
@@ -169,182 +168,133 @@ class Matrix:
         return self
 
     # Сравнение размерностей двух матриц и бросание исключения
-    def __raise_exception(self, other):
-        rows_quantity_1 = len(self.__rows)
-        columns_quantity_1 = len(self.__rows[0])
-
-        rows_quantity_2 = len(other.__rows)
-        columns_quantity_2 = len(other.__rows[0])
-
-        if rows_quantity_1 != rows_quantity_2 or columns_quantity_1 != columns_quantity_2:
-            raise ValueError(f"Размеры двух матриц: первой матрицы {rows_quantity_1}x{columns_quantity_1} и "
-                             f"второй - {rows_quantity_2}x{columns_quantity_2}, не равны")
+    def __compare_dimensions(self, other):
+        if self.rows_quantity != other.rows_quantity or self.columns_quantity != other.columns_quantity:
+            raise ValueError(f"Размеры двух матриц: первой матрицы {self.rows_quantity}x{self.columns_quantity} и "
+                             f"второй - {other.rows_quantity}x{other.columns_quantity}, не равны")
 
     # 3. c) Прибавление к матрице другой матрицы:
     def __iadd__(self, other):
-        self.__raise_exception(other)
+        if not isinstance(other, Matrix):
+            raise TypeError(f"Объект {other} не является объектом класса Matrix")
 
-        rows_quantity_1 = len(self.__rows)
+        self.__compare_dimensions(other)
 
-        for i in range(rows_quantity_1):
+        for i in range(self.rows_quantity):
             self.__rows[i] += other.__rows[i]
 
         return self
 
     # 3. d) Вычитание из матрицы другой матрицы:
     def __isub__(self, other):
-        self.__raise_exception(other)
+        if not isinstance(other, Matrix):
+            raise TypeError(f"Объект {other} не является объектом класса Matrix")
 
-        rows_quantity_1 = len(self.__rows)
+        self.__compare_dimensions(other)
 
-        for i in range(rows_quantity_1):
+        for i in range(self.rows_quantity):
             self.__rows[i] -= other.__rows[i]
 
         return self
 
     # 3. e) Прибавление к матрице другой матрицы:
     def __add__(self, other):
-        self.__raise_exception(other)
+        if not isinstance(other, Matrix):
+            raise TypeError(f"Объект {other} не является объектом класса Matrix")
 
-        summary = copy.deepcopy(self)
-        Matrix.__iadd__(summary, other)
-        return summary
+        self.__compare_dimensions(other)
+
+        matrices_sum = Matrix(self.rows_quantity, self.columns_quantity)
+        Matrix.__iadd__(matrices_sum, other)
+        return matrices_sum
 
     # 3. f) Вычитание матриц:
     def __sub__(self, other):
-        self.__raise_exception(other)
+        if not isinstance(other, Matrix):
+            raise TypeError(f"Объект {other} не является объектом класса Matrix")
 
-        subtraction = copy.deepcopy(self)
-        Matrix.__isub__(subtraction, other)
-        return subtraction
+        self.__compare_dimensions(other)
+
+        matrices_difference = Matrix(self.rows_quantity, self.columns_quantity)
+        Matrix.__isub__(matrices_difference, other)
+        return matrices_difference
 
     # 3. g) Умножение матриц:
     def __mul__(self, other):
-        rows_quantity_1 = len(self.__rows)
-        rows_quantity_2 = len(other.__rows)
-        columns_quantity_1 = len(self.__rows[0])
-        columns_quantity_2 = len(other.__rows[0])
+        if not isinstance(other, Matrix):
+            raise TypeError(f"Объект {other} не является объектом класса Matrix")
 
         # Проверка размеров матриц в соответствии с правилами умножения матриц
-        if columns_quantity_1 != rows_quantity_2:
-            raise ValueError(f"Количество строк первой матрицы {rows_quantity_1}x{columns_quantity_1} должно "
-                             f"быть равно количеству столбцов второй - {rows_quantity_2}x{columns_quantity_2}")
+        if self.columns_quantity != other.rows_quantity:
+            raise ValueError(f"Количество столбцов первой матрицы {self.rows_quantity}x{self.columns_quantity} должно "
+                             f"быть равно количеству строк второй - {other.rows_quantity}x{other.columns_quantity}")
 
-        multiplication_product = [0] * rows_quantity_1
+        product = [None] * self.rows_quantity
 
-        for i in range(rows_quantity_1):
-            multiplication_product[i] = [0] * columns_quantity_2
+        for i in range(self.rows_quantity):
+            product[i] = [0] * other.columns_quantity
 
-        for i in range(rows_quantity_1):
-            for j in range(columns_quantity_2):
-                for k in range(rows_quantity_2):
-                    multiplication_product[i][j] += self.__rows[i][k] * other.__rows[k][j]
+        for i in range(self.rows_quantity):
+            for j in range(other.columns_quantity):
+                for k in range(other.rows_quantity):
+                    product[i][j] += self.__rows[i][k] * other.__rows[k][j]
 
-        return Matrix(multiplication_product)
+        return Matrix(product)
 
     # 3. h) Умножение матрицы на вектор-столбец:
     def multiply_by_vector(self, vector):
         if not isinstance(vector, Vector):
-            raise TypeError(f"Объект {vector} не является объектом класса Vector")
+            raise TypeError(f"Объект {vector} не является объектом класса Vector."
+                            f"Вместо этого передан тип {type(vector).__name__}")
 
-        rows_quantity = len(self.__rows)
-        columns_quantity = len(self.__rows[0])
+        if vector.dimension != self.columns_quantity:
+            raise ValueError(f"Размерность вектора {vector}: {vector.dimension}, должна "
+                             f"быть равна количеству столбцов матрицы - {self}: {self.columns_quantity}")
 
-        vector_length = len(vector)
+        result_vector = [0] * self.rows_quantity
 
-        if vector_length != columns_quantity:
-            raise ValueError(f"Длина вектора {vector}: {vector_length}, должна "
-                             f"быть равна количеству столбцов матрицы - {self}: {columns_quantity}")
+        for i in range(self.rows_quantity):
+            for j in range(self.columns_quantity):
+                result_vector[i] += self.__rows[i][j] * vector[j]
 
-        resulted_vector = []
-
-        for i in range(rows_quantity):
-            resulted_vector.append(0)
-
-        for i in range(rows_quantity):
-            for j in range(columns_quantity):
-                resulted_vector[i] += self.__rows[i][j] * vector[j]
-
-        return Vector(resulted_vector)
+        return Vector(result_vector)
 
     # 3. i) Переопределить методы __eq__ и __hash__:
-    def __eq__(self, other):
-        if not isinstance(other, Matrix):
-            raise TypeError(f"Объект {other} не является объектом класса Matrix")
-
-        self.__raise_exception(other)
-
-        if other.__rows.__hash__ != self.__rows.__hash__:
-            return False
-
-        rows_quantity_1 = len(self.__rows)
-        rows_quantity_2 = len(other.__rows)
-
-        columns_quantity_1 = len(self.__rows[0])
-        columns_quantity_2 = len(other.__rows[0])
-
-        if rows_quantity_1 != rows_quantity_2 or columns_quantity_1 != columns_quantity_2:
-            return False
-        else:
-            for i in range(rows_quantity_1):
-                for j in range(columns_quantity_1):
-                    if self.__rows[i][j] != other.__rows[i][j]:
-                        return False
-
-            return True
-
     def __hash__(self):
         return hash(tuple(self.__rows))
 
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+
+        return other.__rows == self.__rows
+
     # 4. d) Метод __repr__ определить, чтобы результат был в виде: {{1, 2}, {2, 3}}
     def __repr__(self):
-        rows_quantity = len(self.__rows)
-        strings_lists = ""
+        strings_lists = map(str, self.__rows)
 
-        for i in range(rows_quantity):
-            strings_lists += (Vector.__repr__(copy.copy(self.__rows[i])))
-
-            if i != rows_quantity - 1:
-                strings_lists += ", "
-
-        return "{" + f"{strings_lists}" + "}"
+        return "{" + ", ".join(strings_lists) + "}"
 
     # 4. b) Транспонирование матрицы:
     def transpose(self):
-        rows_quantity = len(self.__rows)
-        columns_quantity = len(self.__rows[0])
+        result_matrix = []
 
-        multiplication_matrix = []
+        for i in range(self.columns_quantity):
+            result_matrix.append(self.rows_quantity * [0])
 
-        for i in range(columns_quantity):
-            multiplication_matrix.append(rows_quantity * [0])
+        for i in range(self.rows_quantity):
+            for j in range(self.columns_quantity):
+                result_matrix[j][i] = self.__rows[i][j]
 
-        for i in range(rows_quantity):
-            for j in range(columns_quantity):
-                multiplication_matrix[j][i] = self.__rows[i][j]
-
-        self.__rows = Matrix(multiplication_matrix)
-
-    # Вычисление определителя матриц 1х1 и 2х2
-    def get_determinant_of_small_matrix(self, columns_quantity):
-        if columns_quantity == 1:
-            return self.__rows[0][0]
-
-        if columns_quantity == 2:
-            return self.__rows[0][0] * self.__rows[1][1] - self.__rows[1][0] * self.__rows[0][1]
+        return Matrix(result_matrix)
 
     # 4. c) Вычисление определителя матрицы:
     def get_determinant(self):
-        rows_quantity = len(self.__rows)
-        columns_quantity = len(self.__rows[0])
+        if self.columns_quantity != self.rows_quantity:
+            raise ValueError(f"Количество строк матрицы должно быть равно количеству столбцов. "
+                             f"Сейчас размеры матрицы: {self.rows_quantity}x{self.columns_quantity}")
 
-        if columns_quantity != rows_quantity:
-            raise IndexError(f"Количество строк матрицы должно быть равно количеству столбцов. "
-                             f"Сейчас размеры матрицы: {rows_quantity}x{columns_quantity}")
-
-        self.get_determinant_of_small_matrix(columns_quantity)
-
-        def get_inner_determinant(matrix):
+        def get_determinant_inner(matrix):
             size = len(matrix[0])
 
             if size == 1:
@@ -353,24 +303,23 @@ class Matrix:
             if size == 2:
                 return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
 
-            if size > 2:
-                determinant = 0
+            determinant = 0
 
-                for k in range(size):
-                    minor = []
+            for k in range(size):
+                minor = []
 
-                    for i in range(size - 1):
-                        minor.append((size - 1) * [0])
+                for i in range(size - 1):
+                    minor.append((size - 1) * [0])
 
-                    for i in range(1, size):
-                        for j in range(0, k):
-                            minor[i - 1][j] = matrix[i][j]
+                for i in range(1, size):
+                    for j in range(0, k):
+                        minor[i - 1][j] = matrix[i][j]
 
-                        for j in range(k + 1, size):
-                            minor[i - 1][j - 1] = matrix[i][j]
+                    for j in range(k + 1, size):
+                        minor[i - 1][j - 1] = matrix[i][j]
 
-                    determinant += pow(-1, k) * matrix[0][k] * get_inner_determinant(minor)
+                determinant += pow(-1, k) * matrix[0][k] * get_determinant_inner(minor)
 
-                return determinant
+            return determinant
 
-        return get_inner_determinant(self.__rows)
+        return get_determinant_inner(self.__rows)

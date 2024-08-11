@@ -17,7 +17,10 @@ print(user_matrix_3)
 print()
 
 print("# 1. d) Конструктор: из списка векторов-строк:")
-user_matrix_4 = Matrix([Vector([1, 9, 0, 10, 0, 9, 10]), Vector([1, 9, 0, 10]), Vector([1, 9, 0, 10]), Vector([1, 9, 0, 10])])
+user_matrix_4 = Matrix([Vector([1, 9, 0, 10, 0, 9, 10]),
+                        Vector([1, 9, 0, 10]),
+                        Vector([1, 9, 0, 10]),
+                        Vector([1, 9, 0, 10])])
 print(user_matrix_4)
 print()
 
@@ -79,8 +82,8 @@ print()
 
 print("# 3. i) Переопределить методы __eq__ и __hash__:")
 user_matrix_14 = Matrix([[1, 2], [3, 6], [3, 6]])
-user_matrix_15 = Matrix([[1, 2], [3, 6], [3, 6]])
-print("Переопределить метод __eq__:", user_matrix_14.__eq__(user_matrix_15))
+user_matrix_15 = Matrix([[1, 2], [3, 6, 0], [3, 6]])
+print("Переопределить метод __eq__:", user_matrix_14 == user_matrix_15)
 print("Переопределить метод __hash__:", hash(user_matrix_15))
 print()
 
@@ -91,8 +94,7 @@ print()
 
 print("# 4. b) Транспонирование матрицы:")
 user_matrix_17 = Matrix([[1, 1, 80, 12], [1, 3, 3, 45], [3, 4, 6, 0]])
-user_matrix_17.transpose()
-print(user_matrix_17)
+print(user_matrix_17.transpose())
 print()
 
 print("# 4. c) Вычисление определителя матрицы:")
@@ -100,3 +102,7 @@ user_matrix_18 = Matrix([[1, 1, 80], [1, 3, 3], [3, 4, 6]])
 determinant = user_matrix_18.get_determinant()
 print(determinant)
 print()
+
+user_matrix_19 = Matrix([[1]])
+determinant = user_matrix_19.get_determinant()
+print(determinant)
