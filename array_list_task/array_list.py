@@ -1,6 +1,3 @@
-import copy
-
-
 class ArrayList:
     def __init__(self, capacity=None):
         if capacity is None:
@@ -73,19 +70,19 @@ class ArrayList:
             raise ValueError(f"{number} должен быть больше нуля")
 
         if self.__capacity < number:
-            self.__items = self.__items + [None] * (number - self.__size - 1)
+            self.__items = self.__items + [None] * (number - self.size - 1)
 
             self.__capacity = number
 
     def trim_to_size(self):
-        difference = len(self.__items) - self.__size
-        trimmed_list = ArrayList(self.__size)
+        difference = len(self.__items) - self.size
+        trimmed_list = ArrayList(self.size)
 
         if difference > 0:
             for i in range(self.__size):
                 trimmed_list[i] = self.__items[i]
 
-            self.__capacity = self.__size
+            self.__capacity = self.size
 
             self.__items = trimmed_list
 
@@ -96,13 +93,21 @@ class ArrayList:
         items_length = len(components)
 
         for i in range(items_length):
-            self.append(int(copy.copy(components[i])))
+            self.__items.append(components[i])
+            self.__size += 1
+
+    def copy(self):
+        copied_list = ArrayList()
+        copied_list.__items = self.__items
+        copied_list.__size = self.__size
+        copied_list.__capacity = self.__capacity
+        return copied_list
 
     def __iter__(self):
-        for i in range(self.__size):
+        for i in range(self.size):
             yield self.__items[i]
 
     def __repr__(self):
-        strings_array_list = map(lambda x: str(copy.copy(x)), self.__items)
+        strings_array_list = map(lambda x: str(x), self.__items)
 
         return "[" + ", ".join(strings_array_list) + "]"

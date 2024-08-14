@@ -13,19 +13,19 @@ class SinglyLinkedList:
     # 2) Получение значения первого элемента:
     def get_first(self):
         if self.__head is None:
-            raise ReferenceError("Список пустой и не имеет первого элемента")
+            raise IndexError("Список пустой и не имеет первого элемента")
 
         return self.__head.data
 
     # Проверка корректности указанного индекса
-    def check_index_1(self, index):
+    def __check_index_1(self, index):
         if not isinstance(index, int):
-           raise TypeError(f"Тип {index} должен быть int")
+            raise TypeError(f"Тип {index} должен быть int")
 
         if index < 0 or index >= self.__count:
-           raise IndexError(f"Указанный индекс должен быть в диапазоне [0, {self.__count - 1}]")
+            raise IndexError(f"Указанный индекс должен быть в диапазоне [0, {self.__count - 1}]")
 
-    def check_index_2(self, index):
+    def __check_index_2(self, index):
         if not isinstance(index, int):
             raise TypeError(f"Тип {index} не является int")
 
@@ -33,13 +33,13 @@ class SinglyLinkedList:
             raise IndexError(f"Указанный индекс должен быть в диапазоне [0, {self.__count}]")
 
     # Проверка корректности переданного значения
-    def check_data(self, data):
+    def __check_data(self, data):
         if not isinstance(data, (int, float)):
-           raise TypeError(f"Тип {data} должен быть int или float")
+            raise TypeError(f"Тип {data} должен быть int или float")
 
     # 3) Получение значения по указанному индексу:
     def __getitem__(self, index):
-        self.check_index_1(index)
+        self.__check_index_1(index)
 
         item = self.__head
         i = 0
@@ -53,8 +53,8 @@ class SinglyLinkedList:
 
     # 4) Изменение значения по указанному индексу:
     def __setitem__(self, index, data):
-        self.check_index_1(index)
-        self.check_data(data)
+        self.__check_index_1(index)
+        self.__check_data(data)
 
         item = self.__head
         i = 0
@@ -68,7 +68,7 @@ class SinglyLinkedList:
 
     # 5)  Удаление элемента по индексу, пусть выдает значение элемента:
     def __delitem__(self, index):
-        self.check_index_1(index)
+        self.__check_index_1(index)
 
         item = self.__head
         i = 0
@@ -96,7 +96,7 @@ class SinglyLinkedList:
 
     # 6)  Вставка элемента в начало списка:
     def insert_in_start(self, data):
-        self.check_data(data)
+        self.__check_data(data)
 
         new_item = ListItem(data, self.__head)
         self.__head = new_item
@@ -105,8 +105,8 @@ class SinglyLinkedList:
 
     # 7)  Вставка элемента по индексу:
     def insert(self, index, data):
-        self.check_index_2(index)
-        self.check_data(data)
+        self.__check_index_2(index)
+        self.__check_data(data)
 
         item = self.__head
         i = 0
@@ -131,7 +131,7 @@ class SinglyLinkedList:
 
     # 8)  Удаление узла по значению, пусть выдает True, если элемент был удален:
     def delete_by_data(self, data):
-        self.check_data(data)
+        self.__check_data(data)
 
         items_quantity = self.__count
         item = self.__head

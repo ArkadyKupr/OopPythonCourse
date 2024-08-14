@@ -26,4 +26,10 @@ print(next(iterator))
 print(next(iterator))
 
 # проверка метода extend
-user_array_list.extend([1, 1, 2])
+user_array_list.extend([1, 1, 2, 7, 7, 8, 5, 5])
+print(user_array_list)
+print(len(user_array_list))
+
+# проверка метода copy
+copied_user_array_list = user_array_list.copy()
+print(copied_user_array_list)
