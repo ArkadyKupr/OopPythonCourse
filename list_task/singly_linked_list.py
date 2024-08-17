@@ -18,157 +18,149 @@ class SinglyLinkedList:
         return self.__head.data
 
     # Проверка корректности указанного индекса
-    def __check_index_1(self, index):
+    def __check_item_index(self, index):
         if not isinstance(index, int):
-            raise TypeError(f"Тип {index} должен быть int")
+            raise TypeError(f"Тип {index} должен быть int. Сейчас тип: {type(index).__name__}")
 
-        if index < 0 or index >= self.__count:
-            raise IndexError(f"Указанный индекс должен быть в диапазоне [0, {self.__count - 1}]")
+        if index < -self.__count or index >= self.__count:
+            raise IndexError(f"Указанный индекс должен быть в диапазоне [{-self.__count}, {self.__count - 1}]"
+                             f"Сейчас передано значение: {index}")
 
-    def __check_index_2(self, index):
-        if not isinstance(index, int):
-            raise TypeError(f"Тип {index} не является int")
+    @staticmethod
+    def __iterate_to_item(index, item):
+        i = 0
 
-        if index < 0 or index > self.__count:
-            raise IndexError(f"Указанный индекс должен быть в диапазоне [0, {self.__count}]")
-
-    # Проверка корректности переданного значения
-    def __check_data(self, data):
-        if not isinstance(data, (int, float)):
-            raise TypeError(f"Тип {data} должен быть int или float")
+        while i < index:
+            item = item.next
+            i += 1
 
     # 3) Получение значения по указанному индексу:
     def __getitem__(self, index):
-        self.__check_index_1(index)
+        self.__check_item_index(index)
+
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += self.__count
 
         item = self.__head
-        i = 0
 
-        while i <= index:
-            if i == index:
-                return item.data
+        self.__iterate_to_item(index, item)
 
-            item = item.next
-            i += 1
+        return item.data
 
     # 4) Изменение значения по указанному индексу:
     def __setitem__(self, index, data):
-        self.__check_index_1(index)
-        self.__check_data(data)
+        self.__check_item_index(index)
+
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += self.__count
 
         item = self.__head
-        i = 0
 
-        while i <= index:
-            if i == index:
-                item.data = data
+        self.__iterate_to_item(index, item)
 
-            item = item.next
-            i += 1
+        return item.data
 
-    # 5)  Удаление элемента по индексу, пусть выдает значение элемента:
+    # 5) Удаление элемента по индексу, пусть выдает значение элемента:
     def __delitem__(self, index):
-        self.__check_index_1(index)
+        self.__check_item_index(index)
+
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += self.__count
 
         item = self.__head
         i = 0
         deleted_data = 0
-        items_quantity = self.__count
 
-        while i < items_quantity:
-            if index == 0:
-                deleted_data = item.data
-                self.__head = item.next
-                self.__count -= 1
-                break
+        if index == 0:
+            deleted_data = item.data
+            self.__head = item.next
+            self.__count -= 1
+        else:
+            while i < self.__count:
+                if i == index - 1:
+                    deleted_data = item.next.data
+                    item.next = item.next.next
 
-            if i == index - 1:
-                deleted_data = item.next.data
-                item.next = item.next.next
+                    i += 1
+                    self.__count -= 1
+                    break
 
+                item = item.next
                 i += 1
-                self.__count -= 1
-
-            item = item.next
-            i += 1
 
         return deleted_data
 
-    # 6)  Вставка элемента в начало списка:
-    def insert_in_start(self, data):
-        self.__check_data(data)
-
-        new_item = ListItem(data, self.__head)
-        self.__head = new_item
+    # 6) Вставка элемента в начало списка:
+    def add_first(self, data):
+        self.__head = ListItem(data, self.__head)
 
         self.__count += 1
 
-    # 7)  Вставка элемента по индексу:
+    # 7) Вставка элемента по индексу:
     def insert(self, index, data):
-        self.__check_index_2(index)
-        self.__check_data(data)
+        if not isinstance(index, int):
+            raise TypeError(f"Тип {index} не является int")
+
+        if index < -self.__count or index > self.__count:
+            raise IndexError(f"Указанный индекс должен быть в диапазоне [{-self.__count}, {self.__count}]"
+                             f"Сейчас передано значение: {index}")
+
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += self.__count
 
         item = self.__head
         i = 0
 
-        while i <= index:
-            if index == 0:
-                self.__head = ListItem(data, item)
+        if index == 0:
+            self.__head = ListItem(data, item)
 
-                self.__count += 1
-                break
+            self.__count += 1
+        else:
+            while i <= index:
+                if i == index - 1:
+                    item.next = ListItem(data, item.next)
 
-            if i == index - 1:
-                reference = item.next
-                item.next = ListItem(data)
-                item.next.next = reference
+                    self.__count += 1
+                    break
 
-                self.__count += 1
-                break
+                item = item.next
+                i += 1
 
-            item = item.next
-            i += 1
-
-    # 8)  Удаление узла по значению, пусть выдает True, если элемент был удален:
+    # 8) Удаление узла по значению, пусть выдает True, если элемент был удален:
     def delete_by_data(self, data):
-        self.__check_data(data)
+        if self.__count == 0:
+            raise IndexError("Список пустой и не имеет первого элемента")
 
-        items_quantity = self.__count
-        item = self.__head
-        i = 0
+        if self.__head.data == data:
+            self.__head = self.__head.next
+            self.__count -= 1
 
-        while i < items_quantity:
-            if i == 0 and item.data == data:
-                reference = item.next
-                self.__head = reference
+            return True
 
-                self.__count -= 1
+        previous_item = self.__head
+        current_item = self.__head.next
 
-                return True
-
-            if item.next.data == data:
-                if i == 0:
-                    reference = item.next
-                    self.__head = reference
-
-                    self.__count -= 1
-
-                    return True
-
-                item.next = item.next.next
+        while current_item is not None:
+            if current_item.data == data:
+                previous_item.next = current_item.next
 
                 self.__count -= 1
-
                 return True
 
-            if item.next.next is None:
-                return False
+            previous_item = previous_item.next
+            current_item = current_item.next
 
-            item = item.next
-            i += 1
+        return False
 
-    # 9)  Удаление первого элемента, пусть выдает значение элемента:
+    # 9) Удаление первого элемента, пусть выдает значение элемента:
     def delete_first(self):
+        if self.__head is None:
+            raise IndexError("Список пустой и не имеет первого элемента")
+
         item = self.__head
         deleted_data = item.data
         self.__head = item.next
@@ -192,18 +184,24 @@ class SinglyLinkedList:
 
     # 11) Копирование списка:
     def copy(self):
+        if self.__head is None:
+            raise IndexError("Список пустой и не имеет первого элемента")
+
         item = self.__head
+
         copied_list = SinglyLinkedList()
-
-        copied_item = ListItem(item.data)
-
-        copied_list.__head = copied_item
         copied_list.__count = self.__count
 
-        while item.next is not None:
-            copied_item.next = ListItem(item.next.data)
-            item = item.next
+        copied_item = ListItem(item.data)
+        copied_list.__head = copied_item
+
+        item = item.next
+
+        while item is not None:
+            copied_item.next = ListItem(item.data)
             copied_item = copied_item.next
+
+            item = item.next
 
         return copied_list
 
@@ -223,4 +221,4 @@ class SinglyLinkedList:
 
         numbers_string += "]"
 
-        return f"{numbers_string}"
+        return numbers_string
