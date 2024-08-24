@@ -46,3 +46,6 @@ print("Вектор:", vector_2)
 vector_5 = Vector([1, 9, 0, 10])
 vector_6 = Vector([1, 3, 7])
 print("Скалярное произведение векторов:", Vector.get_scalar_product(vector_5, vector_6))
+
+print("Поддержка slice в __getitem__:")
+print(vector_5[-4:-1:-2])
