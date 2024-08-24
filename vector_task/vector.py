@@ -187,22 +187,22 @@ class Vector:
             if start is None and stop is None:
                 if step < 0:
                     start = -self.dimension - 1
-                    stop = - 1
+                    stop = -1
                 else:
                     start = 0
                     stop = self.dimension
 
             if stop is None:
                 if step < 0:
-                    if start <= - 1:
-                        stop = - 1
+                    if start <= -1:
+                        stop = -1
                     else:
                         stop = self.dimension - 1
                 else:
                     if start >= 0:
                         stop = self.dimension
                     else:
-                        stop = - 1
+                        stop = -1
 
             if start is None:
                 if step < 0:
