@@ -35,8 +35,8 @@ print()
 
 print("Получение вектора-столбца по индексу:", user_matrix_4.get_column(-7))
 
-user_matrix_1[0] = [0, 1]
-user_matrix_4[-4] = [0, 1, 6, 7]
+user_matrix_1[0] = Vector([0, 1])
+user_matrix_4[-4] = Vector([0, 1, 6, 7])
 print("Задание вектора-строки по индексу:", user_matrix_1)
 print("Задание вектора-строки по индексу:", user_matrix_4)
 print()
@@ -63,10 +63,10 @@ print()
 print("# 3. e) Прибавление к матрице другой матрицы:")
 user_matrix_9 = Matrix([[1, 2], [3, 6], [3, 6]])
 user_matrix_10 = Matrix([[1, 2], [3, 6], [5, 7]])
-print(Matrix(user_matrix_9 + user_matrix_10))
+print(user_matrix_9 + user_matrix_10)
 print()
 print("# 3. f) Вычитание матриц:")
-print(Matrix(user_matrix_9 - user_matrix_10))
+print(user_matrix_9 - user_matrix_10)
 print()
 
 print("# 3. g) Умножение матриц:")
