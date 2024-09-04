@@ -272,12 +272,12 @@ class Matrix:
 
     # 4. b) Транспонирование матрицы:
     def transpose(self):
-        result_list = self
+        result_list = [None] * self.columns_quantity
 
         for i in range(self.columns_quantity):
-            self.append(result_list.get_column(i))
+            result_list[i] = self.get_column(i)
 
-        return self
+        self.__rows = result_list
 
     # 4. c) Вычисление определителя матрицы:
     def get_determinant(self):

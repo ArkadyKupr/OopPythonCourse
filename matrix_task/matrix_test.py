@@ -93,8 +93,9 @@ print(user_matrix_16.get_column(2))
 print()
 
 print("# 4. b) Транспонирование матрицы:")
-user_matrix_17 = Matrix([[1, 1, 80, 12], [1, 3, 3, 45], [3, 4, 6, 0]])
-print(user_matrix_17.transpose())
+user_matrix_17 = Matrix([[1, 1, 80, 12], [1, 3, 3, 45]])
+Matrix.transpose(user_matrix_17)
+print(user_matrix_17)
 print()
 
 print("# 4. c) Вычисление определителя матрицы:")
