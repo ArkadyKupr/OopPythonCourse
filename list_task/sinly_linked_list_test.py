@@ -7,6 +7,7 @@ user_list.add_first(2)
 user_list.add_first(3)
 user_list.add_first(4)
 user_list.add_first(9)
+user_list.add_first(10)
 
 print("# 1) Получение размера списка:")
 print("Размер списка:", len(user_list))
@@ -27,13 +28,18 @@ print()
 
 print("# 5)  Удаление элемента по индексу, пусть выдает значение элемента:")
 print(user_list)
-del user_list[1]
-print("Удалили значение элемента:", user_list)
+print("Удалили значение первого элемента:", user_list[0])
+del user_list[0]
 print(user_list)
 print()
 
+print("Удалили значение элемента:", user_list[-2])
+del user_list[-2]
+print(user_list)
+print()
+
+print("Удалили значение элемента:", user_list[-1])
 del user_list[-1]
-print("Удалили значение элемента:", user_list)
 print(user_list)
 print()
 
@@ -71,3 +77,4 @@ print()
 print("# 11) Копирование списка:")
 copy = user_list.copy()
 print(copy)
+print()

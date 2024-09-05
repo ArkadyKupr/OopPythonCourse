@@ -26,13 +26,21 @@ class SinglyLinkedList:
             raise IndexError(f"Указанный индекс должен быть в диапазоне [{-self.__count}, {self.__count - 1}]"
                              f"Сейчас передано значение: {index}")
 
-    @staticmethod
-    def __iterate_to_item(index, item):
+    # Проход по списку до элемента с индексом - index и олучение этого элемента
+    def __get_item(self, index):
+        item = self.__head
         i = 0
 
         while i < index:
             item = item.next
             i += 1
+
+        return item
+
+    # Проверка, что список не пустой
+    def __check_list_emptiness(self):
+        if self.__head is None:
+            raise IndexError("Список пустой и не имеет первого элемента")
 
     # 3) Получение значения по указанному индексу:
     def __getitem__(self, index):
@@ -42,9 +50,7 @@ class SinglyLinkedList:
         if index < 0:
             index += self.__count
 
-        item = self.__head
-
-        self.__iterate_to_item(index, item)
+        item = self.__get_item(index)
 
         return item.data
 
@@ -56,9 +62,8 @@ class SinglyLinkedList:
         if index < 0:
             index += self.__count
 
-        item = self.__head
-
-        self.__iterate_to_item(index, item)
+        item = self.__get_item(index)
+        item.data = data
 
         return item.data
 
@@ -70,26 +75,19 @@ class SinglyLinkedList:
         if index < 0:
             index += self.__count
 
-        item = self.__head
-        i = 0
-        deleted_data = 0
-
         if index == 0:
-            deleted_data = item.data
-            self.__head = item.next
-            self.__count -= 1
-        else:
-            while i < self.__count:
-                if i == index - 1:
-                    deleted_data = item.next.data
-                    item.next = item.next.next
+            self.delete_first()
+            return
 
-                    i += 1
-                    self.__count -= 1
-                    break
+        item = self.__get_item(index)
 
-                item = item.next
-                i += 1
+        deleted_data = item.data
+        deleted_next = item.next
+
+        item = self.__get_item(index - 1)
+        item.next = deleted_next
+
+        self.__count -= 1
 
         return deleted_data
 
@@ -113,27 +111,21 @@ class SinglyLinkedList:
             index += self.__count
 
         item = self.__head
-        i = 0
 
         if index == 0:
             self.__head = ListItem(data, item)
 
             self.__count += 1
         else:
-            while i <= index:
-                if i == index - 1:
-                    item.next = ListItem(data, item.next)
+            item = self.__get_item(index - 1)
+            item.next = ListItem(data, item.next)
 
-                    self.__count += 1
-                    break
-
-                item = item.next
-                i += 1
+            self.__count += 1
 
     # 8) Удаление узла по значению, пусть выдает True, если элемент был удален:
     def delete_by_data(self, data):
-        if self.__count == 0:
-            raise IndexError("Список пустой и не имеет первого элемента")
+        if self.__head is None:
+            return False
 
         if self.__head.data == data:
             self.__head = self.__head.next
@@ -158,12 +150,11 @@ class SinglyLinkedList:
 
     # 9) Удаление первого элемента, пусть выдает значение элемента:
     def delete_first(self):
-        if self.__head is None:
-            raise IndexError("Список пустой и не имеет первого элемента")
+        self.__check_list_emptiness()
 
-        item = self.__head
-        deleted_data = item.data
-        self.__head = item.next
+        first = self.__head
+        deleted_data = first.data
+        self.__head = first.next
 
         self.__count -= 1
 
@@ -185,7 +176,10 @@ class SinglyLinkedList:
     # 11) Копирование списка:
     def copy(self):
         if self.__head is None:
-            raise IndexError("Список пустой и не имеет первого элемента")
+            copied_list = SinglyLinkedList()
+            copied_list.__count = self.__count
+
+            return copied_list
 
         item = self.__head
 
