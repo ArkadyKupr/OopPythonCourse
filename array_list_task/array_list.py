@@ -1,113 +1,220 @@
-class ArrayList:
-    def __init__(self, capacity=None):
-        if capacity is None:
-            self.__capacity = 10
+from collections.abc import MutableSequence
+
+
+class ArrayList(MutableSequence):
+    def __init__(self, size=None):
+        if size is None:
+            self.__size = 10
         else:
-            if not isinstance(capacity, int):
-                raise TypeError(f"Тип {capacity} должен быть int")
+            if not isinstance(size, int):
+                raise TypeError(f"Тип {size} должен быть int")
 
-            if capacity < 0:
-                raise ValueError(f"{capacity} должен быть больше нуля. Передано значение: {capacity}")
+            if size < 0:
+                raise ValueError(f"Вместимость должна быть >= 0. Передано значение: {size}")
 
-            self.__capacity = capacity
+            self.__size = size
 
-        self.__items = [None] * self.__capacity
-        self.__size = 0
-
-    # свойство для получения размерности списка на массиве
-    @property
-    def size(self):
-        return self.__size
+        self.__items = [None] * self.__size
+        self.__count = 0
 
     def __len__(self):
-        return self.__size
+        return len(self.__items)
 
-    def check(self, item):
-        if not isinstance(item, int):
-            raise TypeError(f"Тип {item} должен быть int")
+    # Проверка, что переданный индекс item-а в списке имеет тип int
+    # Проверка, что переданный индекс item-а не выходит за диапазон допустимых значений списка
+    def __check_item_index(self, index):
+        if not isinstance(index, int):
+            raise TypeError(f"Тип {index} должен быть int. Сейчас тип: {type(index.__name__)}")
 
-        if item < 0 or item > self.size:
-            raise ValueError(f"{item} должен лежать в пределе [0, {self.size}]")
+        if index < -len(self) or index >= len(self):
+            raise ValueError(f"Индекс: {index}, должен лежать в диапазоне [-{len(self)}, {len(self) - 1}]")
 
-    def __getitem__(self, item):
-        self.check(item)
+    def __getitem__(self, index):
+        self.__check_item_index(index)
 
-        return self.__items[item]
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += self.__size
 
-    def __setitem__(self, key, value):
-        self.check(key)
+        return self.__items[index]
 
-        self.__items[key] = value
+    def __setitem__(self, index, value):
+        self.__check_item_index(index)
 
-        self.__size += 1
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += self.__size
 
+        self.__items[index] = value
+
+        self.__count += 1
+
+    # Функция удаление значения по индексу должна возвращать удаленное значение
     def pop(self, index):
-        self.check(index)
+        self.__check_item_index(index)
 
-        if index < self.size - 1:
-            for i in range(index, self.size):
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += len(self.__items)
+
+        deleted_item = self[index]
+
+        if index < self.__count - 1:
+            for i in range(index, self.__count):
                 self.__items[i] = self.__items[i + 1]
 
-        self.__items[self.size - 1] = None
-        self.__size -= 1
+        self.__items[self.__count - 1] = None
+        self.__count -= 1
+        self.__size = len(self.__items)
+
+        return deleted_item
 
     def append(self, element):
-        if self.size >= len(self.__items):
-            self.increase_capacity()
+        if self.__count >= len(self.__items):
+            self.__increase_capacity()
 
-        self.__items[self.size] = element
-        self.__size += 1
+        self.__items[self.__count] = element
+        self.__count += 1
 
-    def increase_capacity(self):
+    # Увеличение длины массива в 2 раза
+    def __increase_capacity(self):
+        # Увеличение длины пустого массива
+        if len(self.__items) == 0:
+            self.__items += [None] * 10
+
         # увеличиваем длину массива в 2 раза
-        self.__items = self.__items + [None] * len(self.__items)
+        self.__items += [None] * len(self.__items)
 
-    def ensure_capacity(self, number):
-        if not isinstance(number, int):
-            raise TypeError(f"Тип {number} должен быть int")
+        self.__size = len(self.__items)
 
-        if number < 0:
-            raise ValueError(f"{number} должен быть больше нуля")
+    # Метод гарантирует, что вместимость списка будет >= указанного числа
+    def ensure_capacity(self, capacity):
+        if not isinstance(capacity, int):
+            raise TypeError(f"Тип {capacity} должен быть int")
 
-        if self.__capacity < number:
-            self.__items = self.__items + [None] * (number - self.size - 1)
+        if len(self.__items) < capacity:
+            self.__items += [None] * (capacity - len(self.__items))
 
-            self.__capacity = number
+        self.__size += (capacity - len(self.__items))
 
+    # Метод урезает внутренний массив до размера списка. Полезно, если в списке было много элементов, а стало мало
     def trim_to_size(self):
-        difference = len(self.__items) - self.size
-        trimmed_list = ArrayList(self.size)
+        if self.__count == 0:
+            self.__items = []
 
-        if difference > 0:
-            for i in range(self.__size):
-                trimmed_list[i] = self.__items[i]
+        self.__items = self.__items[0: self.__count]
 
-            self.__capacity = self.size
-
-            self.__items = trimmed_list
-
+    # Метод, который добавляет в список сразу большое количество элементов
     def extend(self, components):
-        if not isinstance(components, list):
-            raise TypeError(f"Тип {components} должен быть list")
+        if not isinstance(components, (list, tuple, dict, set, ArrayList)):
+            raise TypeError(f"Тип {components} должен быть коллекцией или принадлежать классу ArrayList. "
+                            f"Сейчас тип: {type(components).__name__}")
 
-        items_length = len(components)
+        self.trim_to_size()
 
-        for i in range(items_length):
-            self.__items.append(components[i])
-            self.__size += 1
+        for component in components:
+            self.__items.append(component)
+            self.__count += 1
+
+        self.__size = len(self.__items)
 
     def copy(self):
-        copied_list = ArrayList()
-        copied_list.__items = self.__items
-        copied_list.__size = self.__size
-        copied_list.__capacity = self.__capacity
+        copied_list = ArrayList(0)
+
+        for element in self.__items:
+            copied_list.__items.append(element)
+            copied_list.__count += 1
+
+        copied_list.__size = len(copied_list)
+
         return copied_list
 
+    def __delitem__(self, index):
+        self.__check_item_index(index)
+
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += len(self.__items)
+
+        if self.__count == 1:
+            self.__items = []
+
+        for i in range(index, self.__count - 1):
+            self.__items[i] = self.__items[i + 1]
+
+        self.__items[self.__count - 1] = None
+
+        self.__count -= 1
+
+    def insert(self, index, data):
+        self.__check_item_index(index)
+
+        if not isinstance(index, int):
+            raise TypeError(f"Тип {index} не является int")
+
+        if index < -self.__count or index > self.__count:
+            raise IndexError(f"Указанный индекс должен быть в диапазоне [{-self.__count}, {self.__count}]"
+                             f"Сейчас передано значение: {index}")
+
+        # Поддержка отрицательных индексов
+        if index < 0:
+            index += self.__size
+
+        self.__items.append(None)
+
+        self.__count += 1
+
+        for i in range(self.__count, index, -1):
+            self.__items[i] = self.__items[i - 1]
+
+        self.__items[index] = data
+
+        self.trim_to_size()
+
     def __iter__(self):
-        for i in range(self.size):
+        for i in range(len(self)):
             yield self.__items[i]
 
     def __repr__(self):
-        strings_array_list = map(lambda x: str(x), self.__items)
+        string = map(lambda x: str(x), self.__items[0: self.__count])
 
-        return "[" + ", ".join(strings_array_list) + "]"
+        return "[" + ", ".join(string) + "]"
+
+    def __eq__(self, other):
+        if not isinstance(self, ArrayList):
+            raise TypeError(f"Объект {self} не являетя объектом класса ArrayList")
+
+        if not isinstance(other, ArrayList):
+            raise TypeError(f"Объект {other} не являетя объектом класса ArrayList")
+
+        return self.__items == other.__items
+
+    def __hash__(self):
+        return hash(tuple(self.__items))
+
+    def __iadd__(self, other):
+        if not isinstance(other, ArrayList):
+            raise TypeError(f"Объект {other} не являетя объектом класса ArrayList")
+
+        if self.__count < other.__count:
+            difference = other.__count - self.__count
+
+            for i in range(difference + 1):
+                self.__items.append(0)
+
+            for i in range(other.__count):
+                self.__items[i] += other.__items[i]
+        else:
+            if self.__count >= other.__count:
+                for i in range(other.__count):
+                    self.__items[i] += other.__items[i]
+
+        return self
+
+    def reverse(self):
+        array_list_middle = int(self.__count / 2)
+
+        for i in range(array_list_middle):
+            copy = self.__items[i]
+            self.__items[i] = self.__items[self.__count - 1 - i]
+            self.__items[self.__count - 1 - i] = copy
