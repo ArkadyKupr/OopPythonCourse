@@ -26,17 +26,53 @@ class ArrayList(MutableSequence):
         if not isinstance(index, int):
             raise TypeError(f"Тип {index} должен быть int. Сейчас тип: {type(index.__name__)}")
 
-        if index < -len(self) or index >= len(self):
-            raise ValueError(f"Индекс: {index}, должен лежать в диапазоне [-{len(self)}, {len(self) - 1}]")
+        if index < -len(self.__items) or index >= len(self.__items):
+            raise ValueError(f"Индекс: {index}, должен лежать в диапазоне "
+                             f"[-{len(self.__items)}, {len(self.__items) - 1}]")
 
-    def __getitem__(self, index):
-        self.__check_item_index(index)
+    def __getitem__(self, slice_array):
+        if isinstance(slice_array, slice):
+            start = slice_array.start
+            stop = slice_array.stop
+            step = slice_array.step
 
-        # Поддержка отрицательных индексов
-        if index < 0:
-            index += self.__size
+            if step is None:
+                step = 1
 
-        return self.__items[index]
+            if start is None:
+                start = 0
+
+            if stop is None:
+                stop = len(self.__items) - 1
+
+            # Поддержка отрицательных значений индексов:
+            if start < 0 and stop < 0:
+                start += len(self.__items)
+                stop += len(self.__items)
+
+            # Поддержка отрицательных step:
+            if step < 0:
+                copy = start
+                start = stop
+                stop = copy
+
+            self.__check_item_index(start)
+            self.__check_item_index(stop)
+
+            slice_list = []
+
+            for i in range(start, stop, step):
+                slice_list.append(self.__items[i])
+
+            return slice_list
+        else:
+            self.__check_item_index(slice_array)
+
+            # Поддержка отрицательных индексов
+            if slice_array < 0:
+                slice_array += len(self.__items)
+
+        return self.__items[slice_array]
 
     def __setitem__(self, index, value):
         self.__check_item_index(index)
