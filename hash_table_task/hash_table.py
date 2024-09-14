@@ -1,7 +1,10 @@
-class HashTable:
+from collections.abc import Collection
+
+
+class HashTable(Collection):
     def __init__(self, size=None):
         if size is None:
-            self.__size = 100
+            self.__size = 10
         else:
             if not isinstance(size, int):
                 raise TypeError(f"Тип {size} должен быть int. Сейчас тип: {type(size).__name__}")
@@ -17,8 +20,7 @@ class HashTable:
         index = abs(hash(key) % len(self.__items))
 
         if self.__items[index] is None:
-            self.__items[index] = []
-            self.__items[index].append([key, value])
+            self.__items[index] = [[key, value]]
         else:
             self.__items[index].append([key, value])
 
@@ -34,19 +36,15 @@ class HashTable:
         index = abs(hash(key) % len(self.__items))
 
         if self.__items[index] is not None:
-            for item in self.__items[index]:
-                if item[0] == key and item[1] == value:
-                    return True
+            return [key, value] in self.__items[index]
 
-            return False
-
-        raise KeyError(f"Хэш-таблица не содержит пару: ({key}, {value})")
+        return False
 
     def __hash__(self):
         return hash(tuple(self))
 
     def __len__(self):
-        return self.__size
+        return len(self.__items)
 
     @property
     def size(self):
@@ -54,4 +52,10 @@ class HashTable:
 
     def __iter__(self):
         for i in range(self.size):
-            yield self.__items[i]
+            for j in range(len(self.__items[i])):
+                yield self.__items[i][j]
+
+    def __repr__(self):
+        strings_list = map(str, self.__items)
+
+        return "[" + ", ".join(strings_list) + "]"
