@@ -7,17 +7,18 @@ class Matrix:
     @dispatch(int, int)
     def __init__(self, rows_quantity, columns_quantity):
         if not isinstance(rows_quantity, int):
-            raise TypeError(f"Тип {rows_quantity} не является int")
+            raise TypeError(f"Тип rows_quantity: {rows_quantity}, не является int")
 
         if rows_quantity <= 0:
-            raise ValueError(f"Количество строк должно быть больше нуля. Сейчас передано значение: {rows_quantity}")
+            raise ValueError("Количество строк должно быть больше нуля. "
+                             f"Сейчас передано значение rows_quantity: {rows_quantity}")
 
         if not isinstance(columns_quantity, int):
-            raise TypeError(f"Тип {columns_quantity} не является int")
+            raise TypeError(f"Тип columns_quantity: {columns_quantity}, не является int")
 
         if columns_quantity <= 0:
             raise ValueError("Количество столбцов должно быть больше нуля. "
-                             f"Сейчас передано значение: {columns_quantity}")
+                             f"Сейчас передано значение columns_quantity: {columns_quantity}")
 
         self.__rows = []
 
@@ -28,7 +29,7 @@ class Matrix:
     @dispatch(object)
     def __init__(self, matrix):
         if not isinstance(matrix, Matrix):
-            raise TypeError(f"Объект {matrix} не является объектом класса Matrix")
+            raise TypeError(f"Объект matrix: {matrix}, не является объектом класса Matrix")
 
         self.__rows = []
 
@@ -40,13 +41,13 @@ class Matrix:
     @dispatch(list)
     def __init__(self, elements):
         if not isinstance(elements, list):
-            raise TypeError(f"Тип {elements} не является list")
+            raise TypeError(f"Тип elements: {elements}, не является list")
 
         rows_quantity = len(elements)
 
         # Проверка, что размер создаваемой матрицы > 0
         if rows_quantity == 0:
-            raise ValueError(f"Размер матрицы {elements} должен быть > 0")
+            raise ValueError(f"Размер матрицы elements: {elements}, должен быть > 0")
 
         if isinstance(elements[0], list):
             # Проверка, что все элементы из двумерного списка имеют тип list
@@ -58,7 +59,7 @@ class Matrix:
                 # Проверка, что каждый элемент списка - это список чисел
                 for component in row:
                     if not isinstance(component, (int, float)):
-                        raise TypeError(f"Строка матрицы: {row}, не является списком чисел")
+                        raise TypeError(f"Строка матрицы row: {row}, не является списком чисел")
 
             max_row_dimension = len(elements[0])
 
@@ -114,16 +115,15 @@ class Matrix:
             raise IndexError(f"Заданный индекс вектора-строки: {index}, должен быть в диапазоне "
                              f"[{-self.rows_quantity}, {self.rows_quantity - 1}]")
 
-        row_vector = self.__rows[index]
-        return row_vector
+        return self.__rows[index]
 
     # 4. а) Получение вектора-столбца по индексу:
     def get_column(self, index):
         if not isinstance(index, int):
-            raise TypeError(f"Тип {index} должен быть int")
+            raise TypeError(f"Тип index: {index}, должен быть int")
 
         if index < -self.columns_quantity or index >= self.columns_quantity:
-            raise IndexError(f"Заданный индекс вектора-столбца: {index}, должен быть в диапазоне: "
+            raise IndexError(f"Заданный индекс вектора-столбца index: {index}, должен быть в диапазоне: "
                              f"[{-self.columns_quantity}, {self.columns_quantity - 1}].")
 
         column_list = []
@@ -138,21 +138,21 @@ class Matrix:
 
     def __setitem__(self, index, row_vector):
         if not isinstance(index, int):
-            raise TypeError(f"Тип {index} должен быть int")
+            raise TypeError(f"Тип index: {index}, должен быть int")
 
         if not isinstance(row_vector, Vector):
-            raise TypeError(f"Тип {row_vector} должен быть Vector")
+            raise TypeError(f"Тип row_vector: {row_vector}, должен быть Vector")
 
         if index < -self.rows_quantity or index >= self.rows_quantity:
-            raise IndexError(f"Заданный индекс вектора-строки: {index}, должен быть в диапазоне: "
+            raise IndexError(f"Заданный индекс вектора-строки index: {index}, должен быть в диапазоне: "
                              f"[{-self.rows_quantity}, {self.rows_quantity - 1}]")
 
-        self.__rows[index] = row_vector
+        self.__rows[index] = Vector(row_vector)
 
     # 3. b) Умножение на скаляр
     def __imul__(self, scalar):
         if not isinstance(scalar, (int, float)):
-            raise TypeError(f"Тип {scalar} должен быть int иди float")
+            raise TypeError(f"Тип scalar: {scalar}, должен быть int иди float")
 
         for row_vector in self:
             row_vector *= scalar
@@ -196,8 +196,7 @@ class Matrix:
 
         self.__check_dimensions_equality(other)
 
-        matrices_sum = Matrix(self.rows_quantity, self.columns_quantity)
-        matrices_sum += self
+        matrices_sum = Matrix(self)
         matrices_sum += other
 
         return matrices_sum
@@ -209,8 +208,7 @@ class Matrix:
 
         self.__check_dimensions_equality(other)
 
-        matrices_difference = Matrix(self.rows_quantity, self.columns_quantity)
-        matrices_difference -= self
+        matrices_difference = Matrix(self)
         matrices_difference -= other
 
         return matrices_difference
@@ -225,10 +223,7 @@ class Matrix:
             raise ValueError(f"Количество столбцов первой матрицы {self.rows_quantity}x{self.columns_quantity} должно "
                              f"быть равно количеству строк второй - {other.rows_quantity}x{other.columns_quantity}")
 
-        product = [None] * self.rows_quantity
-
-        for i in range(self.rows_quantity):
-            product[i] = [0] * other.columns_quantity
+        product = [[0 for i in range(other.columns_quantity)] for j in range(self.rows_quantity)]
 
         for i in range(self.rows_quantity):
             for j in range(other.columns_quantity):
@@ -247,12 +242,7 @@ class Matrix:
             raise ValueError(f"Размерность вектора {vector}: {vector.dimension}, должна "
                              f"быть равна количеству столбцов матрицы - {self}: {self.columns_quantity}")
 
-        product = [None] * self.rows_quantity
-
-        for i in range(self.rows_quantity):
-            product[i] = Vector.get_scalar_product(self.__rows[i], vector)
-
-        return Vector(product)
+        return Vector([Vector.get_scalar_product(row, vector) for row in self.__rows])
 
     # 3. i) Переопределить методы __eq__ и __hash__:
     def __hash__(self):
@@ -271,13 +261,9 @@ class Matrix:
         return "{" + ", ".join(strings_lists) + "}"
 
     # 4. b) Транспонирование матрицы:
+    # https://docs.python.org/2/tutorial/datastructures.html
     def transpose(self):
-        result_list = [None] * self.columns_quantity
-
-        for i in range(self.columns_quantity):
-            result_list[i] = self.get_column(i)
-
-        self.__rows = result_list
+        self.__rows = [Vector([row[i] for row in self.__rows]) for i in range(self.columns_quantity)]
 
     # 4. c) Вычисление определителя матрицы:
     def get_determinant(self):
