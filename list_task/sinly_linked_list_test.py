@@ -22,8 +22,9 @@ print("Значение по указанному индексу:", user_list[-3
 print()
 
 print("# 4) Изменение значения по указанному индексу:")
+print("Список до изменения:", user_list)
 user_list[2] = 2000
-print("Изменили значение на:", user_list[2])
+print("Измененный список:", user_list)
 print()
 
 print("# 5)  Удаление элемента по индексу, пусть выдает значение элемента:")
@@ -63,8 +64,13 @@ print("Удаление узла:", user_list.delete_by_data(3))
 print(user_list)
 print()
 
+print("Удаление первого узла:", user_list.delete_by_data(10))
+print(user_list)
+print()
+
+
 print("# 9)  Удаление первого элемента, пусть выдает значение элемента:")
-print("Получение значения первого удаленного элемента:", user_list.delete_first())
+print("Получение значения удаленного первого элемента:", user_list.delete_first())
 print(user_list)
 print()
 
