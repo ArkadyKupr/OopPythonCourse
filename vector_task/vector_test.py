@@ -48,8 +48,30 @@ vector_6 = Vector([1, 3, 7])
 print("Скалярное произведение векторов:", Vector.get_scalar_product(vector_5, vector_6))
 
 print("Поддержка slice в __getitem__:")
-print(vector_5[1:2:1])
-print(vector_5[1:3:-1])
-print(vector_5[-4:-1:-2])
-print(vector_5[-3:-1:2])
+print("Вектор:", vector_5)
+user_list = [1, 9, 0, 10]
+print()
 
+print(vector_5[::])
+print("Работа slice на списке:", user_list[::])
+print()
+
+print(vector_5[1:2:1])
+print("Работа slice на списке:", user_list[1:2:1])
+print()
+
+print(vector_5[1:3:-1])
+print("Работа slice на списке:", user_list[1:3:-1])
+print()
+
+print(vector_5[-4:-1:-2])
+print("Работа slice на списке:", user_list[-4:-1:-2])
+print()
+
+print(vector_5[-3:-1:2])
+print("Работа slice на списке:", user_list[-3:-1:2])
+print()
+
+print(vector_5[:-1:2])
+print("Работа slice на списке:", user_list[:-1:2])
+print()

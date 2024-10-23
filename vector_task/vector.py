@@ -8,10 +8,10 @@ class Vector:
     def __init__(self, dimension):
         if not isinstance(dimension, int):
             raise TypeError(f"Тип dimension: {dimension}, не является int. "
-                            f"Сейчас тип: {type(dimension).__name__}")
+                            f"Сейчас тип dimension: {type(dimension).__name__}")
 
         if dimension <= 0:
-            raise ValueError(f"Размерность вектора должна быть > 0, но передана размерность {dimension}")
+            raise ValueError(f"Размерность вектора dimension должна быть > 0, но передана размерность {dimension}")
 
         self.__components = dimension * [0]
 
@@ -20,7 +20,7 @@ class Vector:
     def __init__(self, vector):
         if not isinstance(vector, Vector):
             raise TypeError(f"Объект vector: {vector}, не является объектом класса Vector. "
-                            f"Сейчас тип: {type(vector).__name__}")
+                            f"Сейчас тип vector: {type(vector).__name__}")
 
         dimension = len(vector)
 
@@ -29,38 +29,33 @@ class Vector:
         for i in range(dimension):
             vector_list[i] = vector[i]
 
-        self.__components = vector_list
+        self.__components = vector_list.copy()
 
     # 1. с) заполнение вектора значениями из списка чисел
     @dispatch(list)
     def __init__(self, components):
         if not isinstance(components, list):
             raise TypeError(f"Объект components: {components}, не является списком. "
-                            f"Сейчас тип: {type(components).__name__}")
+                            f"Сейчас тип components: {type(components).__name__}")
 
         if len(components) <= 0:
-            raise ValueError(f"Размерность вектора должна быть > 0, но передан список с размерностью {len(components)}")
+            raise ValueError("Размерность вектора должна быть > 0, но передан список "
+                             f"components с размерностью {len(components)}")
 
         for component in components:
             if not isinstance(component, (int, float)):
-                raise TypeError(f"Тип всех элементов списка {components} должен быть int или float. "
+                raise TypeError(f"Тип всех элементов списка components: {components}, должен быть int или float. "
                                 f"Сейчас тип component: {type(component).__name__}")
 
-        dimension = len(components)
-        components_list = dimension * [0]
-
-        for i in range(dimension):
-            components_list[i] = components[i]
-
-        self.__components = components_list
+        self.__components = components.copy()
 
     # 1. d) заполнение вектора значениями из списка чисел.
     # Если длина списка меньше dimension, то считать, что в остальных компонентах 0.
     @dispatch(int, list)
     def __init__(self, dimension, components):
         if not isinstance(components, list):
-            raise TypeError(f"Components: {components}, не является списком. "
-                            f"Сейчас тип: {type(components).__name__}")
+            raise TypeError(f"Переменная components: {components}, не является списком. "
+                            f"Сейчас тип components: {type(components).__name__}")
 
         components_dimension = len(components)
 
@@ -71,10 +66,10 @@ class Vector:
 
         if not isinstance(dimension, int):
             raise TypeError(f"Тип dimension: {dimension}, не является int. "
-                            f"Сейчас тип: {type(dimension).__name__}")
+                            f"Сейчас тип dimension: {type(dimension).__name__}")
 
         if dimension <= 0:
-            raise ValueError(f"Размерность вектора должна быть > 0, но задана размерность - {dimension}")
+            raise ValueError(f"Размерность вектора dimension должна быть > 0, но задана размерность - {dimension}")
 
         self.__components = dimension * [0]
 
@@ -111,7 +106,7 @@ class Vector:
     def __eq__(self, other):
         if not isinstance(other, Vector):
             raise TypeError(f"Объект other: {other}, не является объектом класса Vector. "
-                            f"Сейчас тип: {type(other).__name__}")
+                            f"Сейчас тип other: {type(other).__name__}")
 
         return self.__components == other.__components
 
@@ -123,7 +118,7 @@ class Vector:
     def __iadd__(self, other):
         if not isinstance(other, Vector):
             raise TypeError(f"Объект other: {other}, не является объектом класса Vector. "
-                            f"Сейчас тип: {type(other).__name__}")
+                            f"Сейчас тип other: {type(other).__name__}")
 
         if self.dimension < other.dimension:
             dimensions_difference = other.dimension - self.dimension
@@ -139,8 +134,8 @@ class Vector:
     # b. Вычитание из вектора другого вектора
     def __isub__(self, other):
         if not isinstance(other, Vector):
-            raise TypeError(f"Объект: {other}, не является объектом класса Vector. "
-                            f"Сейчас тип: {type(other).__name__}")
+            raise TypeError(f"Объект other: {other}, не является объектом класса Vector. "
+                            f"Сейчас тип other: {type(other).__name__}")
 
         if self.dimension < other.dimension:
             dimensions_difference = other.dimension - self.dimension
@@ -157,7 +152,7 @@ class Vector:
     def __add__(self, other):
         if not isinstance(other, Vector):
             raise TypeError(f"Объект other: {other}, не является объектом класса Vector. "
-                            f"Сейчас тип: {type(other).__name__}")
+                            f"Сейчас тип other: {type(other).__name__}")
 
         sum_vector = Vector(self)
         sum_vector += other
@@ -168,7 +163,7 @@ class Vector:
     def __sub__(self, other):
         if not isinstance(other, Vector):
             raise TypeError(f"Объект other: {other}, не является объектом класса Vector. "
-                            f"Сейчас тип: {type(other).__name__}")
+                            f"Сейчас тип other: {type(other).__name__}")
 
         difference_vector = Vector(self)
         difference_vector -= other
@@ -176,10 +171,11 @@ class Vector:
         return difference_vector
 
         # e. Умножение вектора на скаляр
+
     def __imul__(self, scalar):
         if not isinstance(scalar, (int, float)):
-            raise TypeError(f"Scalar: {scalar}, не является числом. "
-                            f"Сейчас тип: {type(scalar).__name__}")
+            raise TypeError(f"Переменная scalar: {scalar}, не является числом. "
+                            f"Сейчас тип scalar: {type(scalar).__name__}")
 
         for i in range(self.dimension):
             self.__components[i] *= scalar
@@ -187,67 +183,38 @@ class Vector:
         return self
 
     # f. Получение и установка компоненты вектора по индексу
-    def __getitem__(self, slice_array):
-        if isinstance(slice_array, slice):
-            start = slice_array.start
-            stop = slice_array.stop
-            step = slice_array.step
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            user_list = []
 
-            if step is None:
-                step = 1
+            for i in range(self.dimension):
+                user_list.append(self.__components[i])
 
-            if start is None:
-                start = 0
+            slice_list = user_list[key.start:key.stop:key.step]
 
-            if stop is None:
-                stop = self.dimension - 1
-
-            # Поддержка отрицательных значений индексов:
-            if start < 0 and stop < 0:
-                start += self.dimension
-                stop += self.dimension
-
-            # Поддержка отрицательных step:
-            if step < 0:
-                copy = start
-                start = stop
-                stop = copy
-
-            if start < -self.dimension or start >= self.dimension:
-                raise IndexError(
-                    f"Индекс start должен быть в диапазоне от -{self.dimension} до {self.dimension - 1}. "
-                    f"Переданный индекс start: {start}")
-
-            if stop < -self.dimension or stop >= self.dimension:
-                raise IndexError(
-                    f"Индекс stop должен быть в диапазоне от -{self.dimension - 1} до {self.dimension}. "
-                    f"Переданный индекс stop: {stop}")
-
-            slice_list = []
-
-            for i in range(start, stop, step):
-                slice_list.append(self.__components[i])
+            if len(slice_list) == 0:
+                return None
 
             return Vector(slice_list)
-        else:
-            if not isinstance(slice_array, int):
-                raise TypeError(f"Индекс {slice_array} не является int. "
-                                f"Сейчас тип: {type(slice_array).__name__}")
 
-            if slice_array < -self.dimension or slice_array >= self.dimension:
-                raise IndexError(f"Индекс должен быть в диапазоне от -{self.dimension} до {self.dimension - 1}. "
-                                 f"Переданный индекс: {slice_array}")
+        if not isinstance(key, int):
+            raise TypeError(f"Индекс key: {key}, не является int. "
+                            f"Сейчас тип key: {type(key).__name__}")
 
-        return self.__components[slice_array]
+        if key < -self.dimension or key >= self.dimension:
+            raise IndexError(f"Индекс key должен быть в диапазоне от -{self.dimension} до {self.dimension - 1}. "
+                             f"Переданный индекс key: {key}")
+
+        return self.__components[key]
 
     def __setitem__(self, index, component):
         if not isinstance(index, int):
-            raise TypeError(f"Индекс {index} не является int. "
-                            f"Сейчас тип: {type(index).__name__}")
+            raise TypeError(f"Индекс index: {index}, не является int. "
+                            f"Сейчас тип index: {type(index).__name__}")
 
         if index < -self.dimension or index >= self.dimension:
-            raise IndexError(f"Индекс должен быть в диапазоне от -{self.dimension} до {self.dimension - 1}."
-                             f"Переданный индекс: {index}")
+            raise IndexError(f"Индекс index должен быть в диапазоне от -{self.dimension} до {self.dimension - 1}."
+                             f"Переданный индекс index: {index}")
 
         self.__components[index] = component
 
@@ -259,11 +226,11 @@ class Vector:
     def get_scalar_product(vector_1, vector_2):
         if not isinstance(vector_1, Vector):
             raise TypeError(f"Объект vector_1: {vector_1}, не является объектом класса Vector. "
-                            f"Сейчас тип: {type(vector_1).__name__}")
+                            f"Сейчас тип vector_1: {type(vector_1).__name__}")
 
         if not isinstance(vector_2, Vector):
             raise TypeError(f"Объект vector_2: {vector_2}, не является объектом класса Vector. "
-                            f"Сейчас тип: {type(vector_2).__name__}")
+                            f"Сейчас тип vector_2: {type(vector_2).__name__}")
 
         min_dimension = min(vector_1.dimension, vector_2.dimension)
 
