@@ -3,9 +3,10 @@ from array_list_task.array_list import ArrayList
 user_array_list_1 = ArrayList(3)
 
 print("Заполнение списка на массиве значениями:")
-user_array_list_1[0] = 10
-user_array_list_1[1] = 10
-user_array_list_1[2] = 10
+user_array_list_1.append(10)
+user_array_list_1.append(10)
+user_array_list_1.append(10)
+user_array_list_1.append(10)
 print(user_array_list_1)
 print()
 
@@ -30,7 +31,7 @@ print(user_array_list_1)
 print()
 
 user_array_list_2 = ArrayList(1)
-user_array_list_2[0] = 10
+user_array_list_2.append(10)
 user_array_list_2.extend([1, 1, 2, 7, 7, 8, 5, 5, 9, 1, 1, 3, 4, 5, 7])
 print("Переопределение метода __eq__:", user_array_list_1 == user_array_list_2)
 print()
@@ -54,10 +55,21 @@ print(user_array_list_1)
 del user_array_list_1[-12]
 print(user_array_list_1)
 print()
+print("Проверка удаления в списке на массиве размера 1:")
+user_array_list_3 = ArrayList(3)
+
+user_array_list_3.append(10)
+print("Список на массиве размера 1 до удаления элемента:", user_array_list_3)
+del user_array_list_3[0]
+print("Список на массиве размера 1 после удаления элемента:", user_array_list_3)
+print()
 
 print("Проверка метода insert:")
 print(user_array_list_1)
 user_array_list_1.insert(-1, 10000)
+print(user_array_list_1)
+print()
+user_array_list_1.insert(13, 10000)
 print(user_array_list_1)
 print()
 
@@ -83,4 +95,4 @@ print()
 print("Проверка slice в __getitem__:")
 print(user_array_list_1)
 print(user_array_list_1[-1:2:-1])
-print(user_array_list_1[0:11:1])
+print(user_array_list_1[0:10:1])
