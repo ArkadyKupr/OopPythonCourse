@@ -151,8 +151,7 @@ class ArrayList(MutableSequence):
         copied_list = ArrayList(len(self.__items))
 
         for item in self.__items:
-            copied_list.__items.append(item)
-            copied_list.__count += 1
+            copied_list.append(item)
 
         return copied_list
 
@@ -197,23 +196,23 @@ class ArrayList(MutableSequence):
 
         self.trim_to_size()
 
-    def __iter__(self):
+    """def __iter__(self):
         for i in range(len(self)):
-            yield self.__items[i]
+            yield self.__items[i]"""
 
     def __repr__(self):
         array_list = map(lambda x: str(x), self.__items[0: self.__count])
 
         return "[" + ", ".join(array_list) + "]"
 
-    def __eq__(self, other):
+    """def __eq__(self, other):
         if not isinstance(other, ArrayList):
             raise TypeError(f"Объект other: {other}, не являетя объектом класса ArrayList")
 
-        return self.__items[0:self.__count] == other.__items[0:other.__count]
+        return self.__items[0:self.__count] == other.__items[0:other.__count]"""
 
-    def __hash__(self):
-        return hash(tuple(self.__items[0:self.__count]))
+    """def __hash__(self):
+        return hash(tuple(self.__items[0:self.__count]))"""
 
     def __iadd__(self, other):
         if not isinstance(other, ArrayList):
@@ -234,10 +233,10 @@ class ArrayList(MutableSequence):
 
         return self
 
-    def reverse(self):
+    """def reverse(self):
         array_list_middle = int(self.__count / 2)
 
         for i in range(array_list_middle):
             copy = self.__items[i]
             self.__items[i] = self.__items[self.__count - 1 - i]
-            self.__items[self.__count - 1 - i] = copy
+            self.__items[self.__count - 1 - i] = copy"""
