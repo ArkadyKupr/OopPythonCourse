@@ -68,7 +68,6 @@ print("Удаление первого узла:", user_list.delete_by_data(10))
 print(user_list)
 print()
 
-
 print("# 9)  Удаление первого элемента, пусть выдает значение элемента:")
 print("Получение значения удаленного первого элемента:", user_list.delete_first())
 print(user_list)

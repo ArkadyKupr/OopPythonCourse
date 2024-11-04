@@ -49,24 +49,20 @@ class SinglyLinkedList:
     def __getitem__(self, index):
         self.__check_item_index(index)
 
-        item = self.__get_item(index)
-
-        return item.data
+        return self.__get_item(index).data
 
     # 4) Изменение значения по указанному индексу:
     def __setitem__(self, index, data):
         self.__check_item_index(index)
 
-        item = self.__get_item(index)
-        item.data = data
+        self.__get_item(index).data = data
 
     # 5) Удаление элемента по индексу, пусть выдает значение элемента:
     def __delitem__(self, index):
         self.__check_item_index(index)
 
         if index == 0:
-            self.delete_first()
-            return
+            return self.delete_first()
 
         previous_item = self.__get_item(index - 1)
         deleted_data = previous_item.next.data
@@ -175,7 +171,7 @@ class SinglyLinkedList:
 
         items_list = []
 
-        for i in range(self.__count):
+        while item is not None:
             items_list.append(str(item.data))
 
             item = item.next
