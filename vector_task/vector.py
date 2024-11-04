@@ -22,14 +22,7 @@ class Vector:
             raise TypeError(f"Объект vector: {vector}, не является объектом класса Vector. "
                             f"Сейчас тип vector: {type(vector).__name__}")
 
-        dimension = len(vector)
-
-        vector_list = dimension * [0]
-
-        for i in range(dimension):
-            vector_list[i] = vector[i]
-
-        self.__components = vector_list.copy()
+        self.__components = list(vector).copy()
 
     # 1. с) заполнение вектора значениями из списка чисел
     @dispatch(list)
@@ -57,8 +50,6 @@ class Vector:
             raise TypeError(f"Переменная components: {components}, не является списком. "
                             f"Сейчас тип components: {type(components).__name__}")
 
-        components_dimension = len(components)
-
         for component in components:
             if not isinstance(component, (int, float)):
                 raise TypeError(f"Элементы списка components: {components}, являются не только числами. "
@@ -72,6 +63,8 @@ class Vector:
             raise ValueError(f"Размерность вектора dimension должна быть > 0, но задана размерность - {dimension}")
 
         self.__components = dimension * [0]
+
+        components_dimension = len(components)
 
         range_boundary = min(components_dimension, dimension)
 
@@ -185,17 +178,13 @@ class Vector:
     # f. Получение и установка компоненты вектора по индексу
     def __getitem__(self, key):
         if isinstance(key, slice):
-            user_list = []
-
-            for i in range(self.dimension):
-                user_list.append(self.__components[i])
-
-            slice_list = user_list[key.start:key.stop:key.step]
+            slice_list = self.__components[key.start:key.stop:key.step]
 
             if len(slice_list) == 0:
-                return None
+                raise IndexError(f"Размерность slice-вектора[key.start:key.start:key.step] должна быть > 0. "
+                                 f"Сейчас передан slice-вектор[{key.start}:{key.start}:{key.step}]")
 
-            return Vector(slice_list)
+            return slice_list
 
         if not isinstance(key, int):
             raise TypeError(f"Индекс key: {key}, не является int. "

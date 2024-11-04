@@ -60,16 +60,16 @@ print(vector_5[1:2:1])
 print("Работа slice на списке:", user_list[1:2:1])
 print()
 
-print(vector_5[1:3:-1])
-print("Работа slice на списке:", user_list[1:3:-1])
+print(vector_5[1:3:1])
+print("Работа slice на списке:", user_list[1:3:1])
 print()
 
-print(vector_5[-4:-1:-2])
-print("Работа slice на списке:", user_list[-4:-1:-2])
+print(vector_5[-4:-1:1])
+print("Работа slice на списке:", user_list[-4:-1:1])
 print()
 
-print(vector_5[-3:-1:2])
-print("Работа slice на списке:", user_list[-3:-1:2])
+print(vector_5[-3:-1:1])
+print("Работа slice на списке:", user_list[-3:-1:1])
 print()
 
 print(vector_5[:-1:2])
