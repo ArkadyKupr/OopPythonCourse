@@ -51,17 +51,13 @@ class ArrayList(MutableSequence):
 
     def __getitem__(self, key):
         if isinstance(key, slice):
-            user_list = []
-
-            for i in range(len(self.__items)):
-                user_list.append(self.__items[i])
-
-            slice_list = user_list[key.start:key.stop:key.step]
+            slice_list = self.__items[key.start:key.stop:key.step]
 
             if len(slice_list) == 0:
-                return None
+                raise IndexError(f"Размерность slice-вектора[key.start:key.start:key.step] должна быть > 0. "
+                                 f"Сейчас передан slice-вектор[{key.start}:{key.start}:{key.step}]")
 
-            return ArrayList(slice_list)
+            return slice_list
 
         self.__check_item_index(key)
 
