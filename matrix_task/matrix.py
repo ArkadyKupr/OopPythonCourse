@@ -115,7 +115,9 @@ class Matrix:
             raise IndexError(f"Заданный индекс вектора-строки: {index}, должен быть в диапазоне "
                              f"[{-self.rows_quantity}, {self.rows_quantity - 1}]")
 
-        return self.__rows[index]
+        copied_vector = self.__rows[index]
+
+        return copied_vector
 
     # 4. а) Получение вектора-столбца по индексу:
     def get_column(self, index):
@@ -223,7 +225,9 @@ class Matrix:
             raise ValueError(f"Количество столбцов первой матрицы {self.rows_quantity}x{self.columns_quantity} должно "
                              f"быть равно количеству строк второй - {other.rows_quantity}x{other.columns_quantity}")
 
-        product = [[0 for i in range(other.columns_quantity)] for j in range(self.rows_quantity)]
+        product = [[0] * other.columns_quantity for _ in range(self.rows_quantity)]
+
+        # Было: product = [[0 for _ in range(other.columns_quantity)] for _ in range(self.rows_quantity)]
 
         for i in range(self.rows_quantity):
             for j in range(other.columns_quantity):
@@ -263,7 +267,9 @@ class Matrix:
     # 4. b) Транспонирование матрицы:
     # https://docs.python.org/2/tutorial/datastructures.html
     def transpose(self):
-        self.__rows = [Vector([row[i] for row in self.__rows]) for i in range(self.columns_quantity)]
+        self.__rows = [self.get_column(i) for i in range(self.columns_quantity)]
+
+        # self.__rows = [Vector([row[i] for row in self.__rows]) for i in range(self.columns_quantity)]
 
     # 4. c) Вычисление определителя матрицы:
     def get_determinant(self):
