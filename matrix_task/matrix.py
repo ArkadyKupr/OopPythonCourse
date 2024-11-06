@@ -135,9 +135,6 @@ class Matrix:
 
         return Vector(column_list)
 
-    def __len__(self):
-        return len(self.__rows)
-
     def __setitem__(self, index, row_vector):
         if not isinstance(index, int):
             raise TypeError(f"Тип index: {index}, должен быть int")
