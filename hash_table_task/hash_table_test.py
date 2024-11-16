@@ -32,11 +32,6 @@ print(f"Элемент {element_5} содержится в хэш-таблице
 print(element_5 in user_hash_table)
 print()
 
-print("Проверка __getitem__:")
-print(user_hash_table[3])
-print(user_hash_table[1])
-print()
-
 print("Проверка __delitem__:")
 print("Хэш-таюлица объектов до удалений:", user_hash_table)
 print(f"Удаление объекта {element_3}:")

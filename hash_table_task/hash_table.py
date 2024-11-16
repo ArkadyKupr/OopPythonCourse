@@ -47,7 +47,7 @@ class HashTable(Collection):
 
         self.__size += 1
 
-    def __getitem__(self, index):
+    """def __getitem__(self, index):
         if not self.__items[index]:
             return None
 
@@ -63,7 +63,7 @@ class HashTable(Collection):
         if index < 0:
             index += len(self.__items)
 
-        return self.__items[index]
+        return self.__items[index]"""
 
     def __contains__(self, element):
         index = self.__get_index(element)
