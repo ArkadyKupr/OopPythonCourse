@@ -4,4 +4,4 @@ class HashTableElement:
         self.__value = value
 
     def __repr__(self):
-        return "{" + f"{self.__key}: {self.__value}" + "}"
+        return f"{{{self.__key}: {self.__value}}}"

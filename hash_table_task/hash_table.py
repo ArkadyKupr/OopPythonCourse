@@ -2,44 +2,50 @@ from collections.abc import Collection
 
 
 class HashTable(Collection):
-    def __init__(self, length=None):
-        if length is None:
-            self.__size = 10
-        elif length <= 0:
-            raise ValueError(f"Размер массива хэш-таблицы length: {length}, должен быть > 0")
-        else:
-            if not isinstance(length, int):
-                raise TypeError(f"Тип размера массива хэш-таблицы length: {length}, должен быть int. "
-                                f"Сейчас тип: {type(length).__name__}")
+    def __init__(self, capacity=None):
+        if capacity is None:
+            capacity = 10
 
-        self.__items = [None] * length
+        if not isinstance(capacity, int):
+            raise TypeError(f"Тип размера массива хэш-таблицы capacity: {capacity}, должен быть int. "
+                            f"Сейчас тип: {type(capacity).__name__}")
+        if capacity <= 0:
+            raise ValueError(f"Размер массива хэш-таблицы capacity: {capacity}, должен быть > 0")
+
+        self.__items = [None] * capacity
 
         # Атрибут, который хранит количество элементов в хэш-таблице
-        self.__elements_quantity = 0
+        self.__size = 0
 
-    @property
-    def elements_quantity(self):
-        return self.__elements_quantity
-
-    # Получение размера хэш-таблицы:
+    # Получение количества элементов в хэш-таблице:
     def __len__(self):
-        return len(self.__items)
+        return self.__size
 
     # Метод для вычисления индекса:
-    def __count_index(self, element):
-        return abs(hash(element) % len(self.__items))
+    def __get_index(self, item):
+        # Вычисление hash-кода для элемента типа list
+        if isinstance(item, list):
+            return abs(self.hash_for_list(item) % len(self.__items))
 
-    def put_object(self, element):
-        index = self.__count_index(element)
+        # Вычисление hash-кода для элемента типа set
+        if isinstance(item, set):
+            return abs(self.hash_for_set(item) % len(self.__items))
+
+        # Вычисление hash-кода для элемента типа dict
+        if isinstance(item, dict):
+            return abs(self.hash_for_set(item) % len(self.__items))
+
+        return abs(hash(item) % len(self.__items))
+
+    def insert_element(self, element):
+        index = self.__get_index(element)
 
         if self.__items[index] is None:
             self.__items[index] = [element]
-
-            self.__elements_quantity += 1
         else:
             self.__items[index].append(element)
 
-            self.__elements_quantity += 1
+        self.__size += 1
 
     def __getitem__(self, index):
         if not self.__items[index]:
@@ -60,68 +66,65 @@ class HashTable(Collection):
         return self.__items[index]
 
     def __contains__(self, element):
-        index = self.__count_index(element)
+        index = self.__get_index(element)
 
-        if self.__items[index] is not None:
-            return element in self.__items[index]
-
-        return False
+        return element in self.__items[index]
 
     # Удаление элемента по значению. Если удалили, то выдает True, иначе - False
-    def delete_element(self, element):
-        index = self.__count_index(element)
+    def delete(self, element):
+        index = self.__get_index(element)
 
         if self.__items[index] is None:
             return False
-        elif len(self.__items[index]) == 1 and self.__items[index][0] == element:
-            self.__items[index] = None
 
-            self.__elements_quantity -= 1
+        for item in self.__items[index]:
+            if item == element:
+                self.__items[index].remove(item)
 
-            return True
-        elif len(self.__items[index]) > 1:
-            element_was_deleted = False
+                # Замена item на None, если item - это пустой список
+                if len(item) == 0:
+                    self.__items[index] = None
 
-            if self.__items[index][len(self.__items[index]) - 1] == element and element_was_deleted is False:
-                self.__items[index][len(self.__items[index]) - 1] = None
-
-                self.__elements_quantity -= 1
-
-                element_was_deleted = True
-            else:
-                for i in range(len(self.__items[index]) - 1):
-                    if self.__items[index][i] == element and element_was_deleted is False:
-                        self.__items[index][i] = None
-
-                        self.__elements_quantity -= 1
-
-                        element_was_deleted = True
-
-                    # Перемещение элементов после индекса i на (i - 1)
-                    if element_was_deleted is True:
-                        self.__items[index][i] = self.__items[index][i + 1]
-
-            # Урезание размера списка:
-            if element_was_deleted is True:
-                self.__items[index] = self.__items[index][0: len(self.__items[index]) - 1]
                 return True
 
-            return False
-        else:
-            return False
-
     def __iter__(self):
-        for i in range(len(self.__items)):
-            if self.__items[i] is None:
-                continue
-
-            for element in self.__items[i]:
-                if element is None:
-                    continue
-                else:
-                    yield element
+        for element in self.__items:
+            if element is None:
+                yield None
+            else:
+                for subelement in element:
+                    if subelement is not None:
+                        yield subelement
 
     def __repr__(self):
         strings_list = map(str, self.__items)
 
         return "[" + ", ".join(strings_list) + "]"
+
+    @staticmethod
+    def hash_for_list(element):
+        hash_sum = 0
+
+        for item in element:
+            hash_sum += hash(item)
+
+        return hash_sum
+
+    @staticmethod
+    def hash_for_set(element):
+        hash_sum = 0
+
+        for item in element:
+            hash_sum += hash(item)
+
+        return hash_sum
+
+    @staticmethod
+    def hash_for_dict(element):
+        hash_sum = 0
+
+        for item in element:
+            hash_sum += hash(item[0])
+            hash_sum += hash(item[1])
+
+        return hash_sum
