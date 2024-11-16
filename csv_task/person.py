@@ -1,7 +1,7 @@
 class Person:
     def __init__(self, name, age):
         if not isinstance(name, str):
-            raise TypeError(f"Тип name: {name}, должен быть str")
+            raise TypeError(f"Тип {name} должен быть str")
 
         if not isinstance(age, int):
             raise TypeError(f"Тип age: {age}, должен быть int")
@@ -12,5 +12,13 @@ class Person:
         self.__name = name
         self.__age = age
 
+    @property
+    def name(self):
+        return self.__name
+
+    @property
+    def age(self):
+        return self.__age
+
     def __repr__(self):
-        return f"({self.__name}, {self.__age})"
+        return f"['{self.__name}', '{self.__age}']"
