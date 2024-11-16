@@ -27,12 +27,12 @@ class SinglyLinkedList:
 
     # Проход по списку до элемента с индексом - index и получение этого элемента
     def __get_item(self, index):
-        item = self.__head
-        i = 0
-
         # Поддержка отрицательных значений индекса:
         if index < 0:
             index += self.__count
+
+        item = self.__head
+        i = 0
 
         while i < index:
             item = item.next
