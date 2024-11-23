@@ -18,20 +18,16 @@ class ArrayList(MutableSequence):
         self.__count = 0
 
     # Для варианта со slice в __getitem__, где нужно выдавать экземпляр своего списка вместо стандартного
+    # В списке должны допускаться любые типы элементов
     @dispatch(list)
     def __init__(self, items):
         if not isinstance(items, list):
             raise TypeError(f"Объект items: {items}, не является списком. "
                             f"Сейчас тип items: {type(items).__name__}")
 
-        if len(items) <= 0:
-            raise ValueError("Размерность списка должна быть > 0, но передан список "
+        if len(items) < 0:
+            raise ValueError("Размерность списка должна быть >= 0, но передан список "
                              f"items с размерностью {len(items)}")
-
-        for item in items:
-            if not isinstance(item, (int, float)):
-                raise TypeError(f"Тип всех элементов списка items: {items}, должен быть int или float. "
-                                f"Сейчас тип item: {type(item).__name__}")
 
         self.__count = len(items)
         self.__items = items.copy()
@@ -45,7 +41,7 @@ class ArrayList(MutableSequence):
         if not isinstance(index, int):
             raise TypeError(f"Тип index: {index}, должен быть int. Сейчас тип: {type(index.__name__)}")
 
-        if index < - len(self.__items) or index >= len(self.__items):
+        if index < -len(self.__items) or index >= len(self.__items):
             raise ValueError(f"Индекс index: {index}, должен лежать в диапазоне "
                              f"[-{len(self.__items)}, {len(self.__items) - 1}]")
 
@@ -54,8 +50,8 @@ class ArrayList(MutableSequence):
             slice_list = self.__items[key.start:key.stop:key.step]
 
             if len(slice_list) == 0:
-                raise IndexError(f"Размерность slice-вектора[key.start:key.start:key.step] должна быть > 0. "
-                                 f"Сейчас передан slice-вектор[{key.start}:{key.start}:{key.step}]")
+                raise IndexError("Размерность slice должна быть > 0. "
+                                 f"Сейчас передан slice: [{key.start}:{key.start}:{key.step}]")
 
             return slice_list
 
@@ -74,10 +70,6 @@ class ArrayList(MutableSequence):
         if index < 0:
             index += len(self.__items)
 
-        if index >= self.__count:
-            raise IndexError(f"Указанный индекс index должен быть в диапазоне [{-self.__count}, {self.__count - 1}] "
-                             f"Сейчас передано значение index: {index}")
-
         self.__items[index] = item
 
     # Функция удаление значения по индексу должна возвращать удаленное значение
@@ -91,7 +83,7 @@ class ArrayList(MutableSequence):
         deleted_item = self[index]
 
         if index < self.__count - 1:
-            for i in range(index, self.__count):
+            for i in range(index, self.__count - 1):
                 self.__items[i] = self.__items[i + 1]
 
         self.__items[self.__count - 1] = None
@@ -100,9 +92,7 @@ class ArrayList(MutableSequence):
         return deleted_item
 
     def append(self, item):
-        if not isinstance(item, (int, float)):
-            raise TypeError(f"Тип item: {item}, должен быть int или float. Сейчас тип: {type(item.__name__)}")
-
+        # В списке должны допускаться любые типы элементов
         if self.__count >= len(self.__items):
             self.__increase_capacity()
 
@@ -111,13 +101,15 @@ class ArrayList(MutableSequence):
         self.__count += 1
 
     # Увеличение длины массива в 2 раза
-    def __increase_capacity(self):
+    def __increase_capacity(self, increase=None):
         # Увеличение длины пустого массива
-        if len(self.__items) == 0:
+        if len(self.__items) == 0 and increase is None:
             self.__items = [None] * 10
-        else:
+        elif increase is None:
             # увеличиваем длину массива в 2 раза
             self.__items += [None] * len(self.__items)
+        else:
+            self.__items += [None] * increase
 
     # Метод гарантирует, что вместимость списка будет >= указанного числа
     def ensure_capacity(self, capacity):
@@ -129,15 +121,23 @@ class ArrayList(MutableSequence):
 
     # Метод урезает внутренний массив до размера списка. Полезно, если в списке было много элементов, а стало мало
     def trim_to_size(self):
-        self.__items = self.__items[0: self.__count]
+        if self.__count < len(self.__items):
+            self.__items = self.__items[0: self.__count]
+
+    # Функция, которая возвращает True, если по типу можно проитерироваться, иначе - False
+    @staticmethod
+    def is_iterable(components):
+        try:
+            iter(components)
+            return True
+        except TypeError:
+            return False
 
     # Метод, который добавляет в список сразу большое количество элементов
     def extend(self, components):
-        if not isinstance(components, (list, tuple, dict, set, ArrayList)):
-            raise TypeError(f"Тип components: {components}, должен быть коллекцией или принадлежать классу ArrayList. "
+        if not self.is_iterable(components):
+            raise TypeError(f"Тип components: {components}, неитерируемый. "
                             f"Сейчас тип components: {type(components).__name__}")
-
-        self.trim_to_size()
 
         for component in components:
             self.__items.append(component)
@@ -174,14 +174,12 @@ class ArrayList(MutableSequence):
             raise IndexError(f"Указанный индекс index должен быть в диапазоне [{-self.__count}, {self.__count}] "
                              f"Сейчас передано значение index: {index}")
 
-        if not isinstance(item, (int, float)):
-            raise TypeError(f"Тип item: {item}, должен быть int или float. Сейчас тип: {type(item.__name__)}")
-
         # Поддержка отрицательных индексов
         if index < 0:
             index += len(self.__items)
 
-        self.__items.append(None)
+        if index == len(self.__items):
+            self.__increase_capacity(1)
 
         for i in range(self.__count, index, -1):
             self.__items[i] = self.__items[i - 1]
@@ -190,49 +188,54 @@ class ArrayList(MutableSequence):
 
         self.__count += 1
 
-        self.trim_to_size()
-
     """def __iter__(self):
         for i in range(len(self)):
             yield self.__items[i]"""
 
     def __repr__(self):
-        array_list = map(lambda x: str(x), self.__items[0: self.__count])
+        items_list = map(lambda x: str(x), self.__items[0: self.__count])
 
-        return "[" + ", ".join(array_list) + "]"
+        return "[" + ", ".join(items_list) + "]"
 
-    """def __eq__(self, other):
+    def __eq__(self, other):
         if not isinstance(other, ArrayList):
             raise TypeError(f"Объект other: {other}, не являетя объектом класса ArrayList")
 
-        return self.__items[0:self.__count] == other.__items[0:other.__count]"""
+        for i in range(self.__count):
+            if self.__items[i] != other.__items[i]:
+                return False
 
-    """def __hash__(self):
-        return hash(tuple(self.__items[0:self.__count]))"""
+        return True
+
+    def __hash__(self):
+        hash_sum = 0
+
+        for i in range(self.__count):
+            hash_sum += self.__items[i]
+
+        return hash_sum
 
     def __iadd__(self, other):
         if not isinstance(other, ArrayList):
-            raise TypeError(f"Объект other: {other}, не являетя объектом класса ArrayList")
+            raise TypeError(f"Объект other: {other}, не являетcя объектом класса ArrayList")
 
-        if self.__count < other.__count:
-            difference = other.__count - self.__count
+        array_list_1_length = len(self.__items)
+        array_list_2_length = len(other.__items)
 
-            for i in range(difference + 1):
-                self.__items.append(0)
+        for i in range(array_list_2_length):
+            self.__items.append(None)
 
-            for i in range(other.__count):
-                self.__items[i] += other.__items[i]
-        else:
-            if self.__count >= other.__count:
-                for i in range(other.__count):
-                    self.__items[i] += other.__items[i]
+        for i in range(0, array_list_2_length):
+            self.__items[i + array_list_1_length] = other.__items[i]
 
-        return self
+            self.__count += other.__count
 
-    """def reverse(self):
+        return self.__items
+
+    def reverse(self):
         array_list_middle = int(self.__count / 2)
 
         for i in range(array_list_middle):
             copy = self.__items[i]
             self.__items[i] = self.__items[self.__count - 1 - i]
-            self.__items[self.__count - 1 - i] = copy"""
+            self.__items[self.__count - 1 - i] = copy

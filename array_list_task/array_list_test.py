@@ -16,8 +16,12 @@ print(user_array_list_1)
 print()
 
 print("Удаление значения по индексу. Функция должна возвращать удаленное значение:")
+print("Список на массиве до удаления:", user_array_list_1)
 print(user_array_list_1.pop(2))
-print(user_array_list_1)
+print("Список на массиве после удаления:", user_array_list_1)
+print()
+print(user_array_list_1.pop(3))
+print("Список на массиве после удаления:", user_array_list_1)
 print()
 
 print("Проверка метода trim_to_size:")
