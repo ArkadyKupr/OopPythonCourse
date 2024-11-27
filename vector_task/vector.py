@@ -22,7 +22,7 @@ class Vector:
             raise TypeError(f"Объект vector: {vector}, не является объектом класса Vector. "
                             f"Сейчас тип vector: {type(vector).__name__}")
 
-        self.__components = list(vector).copy()
+        self.__components = [component for component in vector]
 
     # 1. с) заполнение вектора значениями из списка чисел
     @dispatch(list)
@@ -167,7 +167,7 @@ class Vector:
 
     def __imul__(self, scalar):
         if not isinstance(scalar, (int, float)):
-            raise TypeError(f"Переменная scalar: {scalar}, не является числом. "
+            raise TypeError(f"Аргумент scalar: {scalar}, не является числом. "
                             f"Сейчас тип scalar: {type(scalar).__name__}")
 
         for i in range(self.dimension):
@@ -181,8 +181,8 @@ class Vector:
             slice_list = self.__components[key.start:key.stop:key.step]
 
             if len(slice_list) == 0:
-                raise IndexError(f"Размерность slice-вектора[key.start:key.start:key.step] должна быть > 0. "
-                                 f"Сейчас передан slice-вектор[{key.start}:{key.start}:{key.step}]")
+                raise IndexError(f"Размерность slice должна быть > 0. "
+                                 f"Сейчас передан slice[{key.start}:{key.start}:{key.step}]")
 
             return slice_list
 
