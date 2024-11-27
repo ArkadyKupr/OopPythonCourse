@@ -2,7 +2,7 @@ from matrix_task.matrix import Matrix
 from vector_task.vector import Vector
 
 print("# 1. a) Конструктор: матрица нулей m x n, где m - rows, а n - columns:")
-user_matrix_1 = Matrix(1, 3)
+user_matrix_1 = Matrix(2, 3)
 print(user_matrix_1)
 print()
 

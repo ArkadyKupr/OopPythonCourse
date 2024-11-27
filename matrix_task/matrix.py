@@ -20,10 +20,7 @@ class Matrix:
             raise ValueError("Количество столбцов должно быть больше нуля. "
                              f"Сейчас передано значение columns_quantity: {columns_quantity}")
 
-        self.__rows = []
-
-        for i in range(rows_quantity):
-            self.__rows.append(Vector(columns_quantity))
+        self.__rows = [Vector(columns_quantity) for __ in range(rows_quantity)]
 
     # 1. b) Конструктор: конструктор копирования с проверкой, что передан объект
     @dispatch(object)
@@ -31,10 +28,7 @@ class Matrix:
         if not isinstance(matrix, Matrix):
             raise TypeError(f"Объект matrix: {matrix}, не является объектом класса Matrix")
 
-        self.__rows = []
-
-        for i in range(matrix.rows_quantity):
-            self.__rows.append(Vector(matrix[i]))
+        self.__rows = [Vector(matrix[i]) for i in range(matrix.rows_quantity)]
 
     # 1. с) Конструктор: из двумерного списка чисел
     # 1. d) Конструктор: из списка векторов-строк
@@ -68,12 +62,8 @@ class Matrix:
                 max_row_dimension = max(len(row), max_row_dimension)
 
             # Копирование аргумента elements c увеличением размеров всех векторов до max_row_dimension
-            self.__rows = []
+            self.__rows = [Vector(max_row_dimension, elements[i]) for i in range(rows_quantity)]
 
-            for i in range(rows_quantity):
-                self.__rows.append(Vector(max_row_dimension))
-
-                self.__rows[i] += Vector(elements[i])
         elif isinstance(elements[0], Vector):
             # Проверка, что все элементы из списка векторов-строк имеют тип Vector
             for i in range(1, rows_quantity):
@@ -94,6 +84,7 @@ class Matrix:
                 self.__rows.append(Vector(max_vector_dimension))
 
                 self.__rows[i] += elements[i]
+
         else:
             raise TypeError("Тип первого элемента списка не является ни list, ни объектом Vector")
 
@@ -115,9 +106,7 @@ class Matrix:
             raise IndexError(f"Заданный индекс вектора-строки: {index}, должен быть в диапазоне "
                              f"[{-self.rows_quantity}, {self.rows_quantity - 1}]")
 
-        copied_vector = self.__rows[index]
-
-        return copied_vector
+        return Vector(self.__rows[index])
 
     # 4. а) Получение вектора-столбца по индексу:
     def get_column(self, index):
@@ -128,25 +117,22 @@ class Matrix:
             raise IndexError(f"Заданный индекс вектора-столбца index: {index}, должен быть в диапазоне: "
                              f"[{-self.columns_quantity}, {self.columns_quantity - 1}].")
 
-        column_list = []
-
-        for i in range(self.rows_quantity):
-            column_list.append(self.__rows[i][index])
+        column_list = [self.__rows[i][index] for i in range(self.rows_quantity)]
 
         return Vector(column_list)
 
-    def __setitem__(self, index, row_vector):
+    def __setitem__(self, index, row):
         if not isinstance(index, int):
             raise TypeError(f"Тип index: {index}, должен быть int")
 
-        if not isinstance(row_vector, Vector):
-            raise TypeError(f"Тип row_vector: {row_vector}, должен быть Vector")
+        if not isinstance(row, Vector):
+            raise TypeError(f"Тип row_vector: {row}, должен быть Vector")
 
         if index < -self.rows_quantity or index >= self.rows_quantity:
             raise IndexError(f"Заданный индекс вектора-строки index: {index}, должен быть в диапазоне: "
                              f"[{-self.rows_quantity}, {self.rows_quantity - 1}]")
 
-        self.__rows[index] = Vector(row_vector)
+        self.__rows[index] = Vector(row)
 
     # 3. b) Умножение на скаляр
     def __imul__(self, scalar):
@@ -224,8 +210,6 @@ class Matrix:
 
         product = [[0] * other.columns_quantity for _ in range(self.rows_quantity)]
 
-        # Было: product = [[0 for _ in range(other.columns_quantity)] for _ in range(self.rows_quantity)]
-
         for i in range(self.rows_quantity):
             for j in range(other.columns_quantity):
                 for k in range(other.rows_quantity):
@@ -262,11 +246,8 @@ class Matrix:
         return "{" + ", ".join(strings_lists) + "}"
 
     # 4. b) Транспонирование матрицы:
-    # https://docs.python.org/2/tutorial/datastructures.html
     def transpose(self):
         self.__rows = [self.get_column(i) for i in range(self.columns_quantity)]
-
-        # self.__rows = [Vector([row[i] for row in self.__rows]) for i in range(self.columns_quantity)]
 
     # 4. c) Вычисление определителя матрицы:
     def get_determinant(self):
