@@ -188,9 +188,9 @@ class ArrayList(MutableSequence):
 
         self.__count += 1
 
-    """def __iter__(self):
+    def __iter__(self):
         for i in range(len(self)):
-            yield self.__items[i]"""
+            yield self.__items[i]
 
     def __repr__(self):
         items_list = map(lambda x: str(x), self.__items[0: self.__count])
