@@ -1,4 +1,4 @@
-from collections.abc import Collection
+from collections.abc import Collection, Hashable
 
 
 class HashTable(Collection):
@@ -9,6 +9,7 @@ class HashTable(Collection):
         if not isinstance(capacity, int):
             raise TypeError(f"Тип размера массива хэш-таблицы capacity: {capacity}, должен быть int. "
                             f"Сейчас тип: {type(capacity).__name__}")
+
         if capacity <= 0:
             raise ValueError(f"Размер массива хэш-таблицы capacity: {capacity}, должен быть > 0")
 
@@ -24,16 +25,8 @@ class HashTable(Collection):
     # Метод для вычисления индекса:
     def __get_index(self, item):
         # Вычисление hash-кода для элемента типа list
-        if isinstance(item, list):
-            return abs(self.hash_for_list(item) % len(self.__items))
-
-        # Вычисление hash-кода для элемента типа set
-        if isinstance(item, set):
-            return abs(self.hash_for_set(item) % len(self.__items))
-
-        # Вычисление hash-кода для элемента типа dict
-        if isinstance(item, dict):
-            return abs(self.hash_for_set(item) % len(self.__items))
+        if not isinstance(item, Hashable):
+            raise TypeError(f"Тип объекта: {item}, не хешируемый")
 
         return abs(hash(item) % len(self.__items))
 
@@ -47,25 +40,10 @@ class HashTable(Collection):
 
         self.__size += 1
 
-    """def __getitem__(self, index):
-        if not self.__items[index]:
-            return None
-
-        if not isinstance(index, int):
-            raise TypeError(f"Тип {index} должен быть int. Сейчас тип: {type(index).__name__}")
-
-        if index < -len(self.__items) or index >= len(self.__items):
-            raise IndexError(f"Указанный индекс index, должен быть в диапазоне "
-                             f"[{-len(self.__items)}, {len(self.__items) - 1}]. "
-                             f"Сейчас передано значение: {index}")
-
-        # Поддержка отрицательных значений индекса:
-        if index < 0:
-            index += len(self.__items)
-
-        return self.__items[index]"""
-
     def __contains__(self, element):
+        if element is None:
+            return ValueError("Передаваемый элемент не должен быть None")
+
         index = self.__get_index(element)
 
         return element in self.__items[index]
@@ -77,54 +55,26 @@ class HashTable(Collection):
         if self.__items[index] is None:
             return False
 
-        for item in self.__items[index]:
-            if item == element:
-                self.__items[index].remove(item)
+        if element in self.__items[index]:
+            self.__items[index].remove(element)
+            self.__size -= 1
 
-                # Замена item на None, если item - это пустой список
-                if len(item) == 0:
-                    self.__items[index] = None
+            return True
 
-                return True
+        return False
 
     def __iter__(self):
-        for element in self.__items:
-            if element is None:
-                yield None
+        for item in self.__items:
+            if item is None:
+                continue
             else:
-                for subelement in element:
-                    if subelement is not None:
-                        yield subelement
+                for element in item:
+                    if element is not None:
+                        yield element
+                    else:
+                        yield None
 
     def __repr__(self):
         strings_list = map(str, self.__items)
 
         return "[" + ", ".join(strings_list) + "]"
-
-    @staticmethod
-    def hash_for_list(element):
-        hash_sum = 0
-
-        for item in element:
-            hash_sum += hash(item)
-
-        return hash_sum
-
-    @staticmethod
-    def hash_for_set(element):
-        hash_sum = 0
-
-        for item in element:
-            hash_sum += hash(item)
-
-        return hash_sum
-
-    @staticmethod
-    def hash_for_dict(element):
-        hash_sum = 0
-
-        for item in element:
-            hash_sum += hash(item[0])
-            hash_sum += hash(item[1])
-
-        return hash_sum
