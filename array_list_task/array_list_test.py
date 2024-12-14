@@ -50,8 +50,13 @@ print(len(user_array_list_1))
 print()
 
 print("Проверка метода copy:")
+print("До копирования:", user_array_list_1)
 copied_user_array_list = user_array_list_1.copy()
 print(copied_user_array_list)
+print("Проверка, что скопировано правильно:")
+user_array_list_1[0] = 999999999999
+print("Список, который копировали:", user_array_list_1)
+print("Копия:", copied_user_array_list)
 print()
 
 print("Проверка метода delitem:")
@@ -79,9 +84,17 @@ print()
 
 print("Список на массиве 1:", user_array_list_1)
 print("Список на массиве 2:", user_array_list_2)
+print("Проверка длин списков на массиве:")
+print("Длина списка на массиве 1:", len(user_array_list_1))
+print("Длина списка на массиве 2:", len(user_array_list_2))
 user_array_list_1 += user_array_list_2
 print("Результат прибавления одного списка на массиве к другому:")
 print(user_array_list_1)
+print("Проверка длины суммарного списка на массиве:")
+print("Длина суммарного списка на массиве:", len(user_array_list_1))
+user_array_list_2[1] = 9999999
+print(user_array_list_1)
+print(user_array_list_2)
 print()
 
 print("Проверка метода reverse:")
