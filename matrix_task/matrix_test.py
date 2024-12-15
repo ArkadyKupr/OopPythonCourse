@@ -35,8 +35,8 @@ print()
 
 print("Получение вектора-столбца по индексу:", user_matrix_4.get_column(-7))
 
-user_matrix_1[0] = Vector([0, 1])
-user_matrix_4[-4] = Vector([0, 1, 6, 7])
+user_matrix_1[0] = Vector([0, 1, 6])
+user_matrix_4[-4] = Vector([0, 1, 6, 7, 8, 9, 7])
 print("Задание вектора-строки по индексу:", user_matrix_1)
 print("Задание вектора-строки по индексу:", user_matrix_4)
 print()

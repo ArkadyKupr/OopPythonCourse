@@ -20,7 +20,7 @@ class Matrix:
             raise ValueError("Количество столбцов должно быть больше нуля. "
                              f"Сейчас передано значение columns_quantity: {columns_quantity}")
 
-        self.__rows = [Vector(columns_quantity) for __ in range(rows_quantity)]
+        self.__rows = [Vector(columns_quantity) for _ in range(rows_quantity)]
 
     # 1. b) Конструктор: конструктор копирования с проверкой, что передан объект
     @dispatch(object)
@@ -28,7 +28,7 @@ class Matrix:
         if not isinstance(matrix, Matrix):
             raise TypeError(f"Объект matrix: {matrix}, не является объектом класса Matrix")
 
-        self.__rows = [Vector(matrix[i]) for i in range(matrix.rows_quantity)]
+        self.__rows = [matrix[i] for i in range(matrix.rows_quantity)]
 
     # 1. с) Конструктор: из двумерного списка чисел
     # 1. d) Конструктор: из списка векторов-строк
@@ -126,11 +126,16 @@ class Matrix:
             raise TypeError(f"Тип index: {index}, должен быть int")
 
         if not isinstance(row, Vector):
-            raise TypeError(f"Тип row_vector: {row}, должен быть Vector")
+            raise TypeError(f"Тип row: {row}, должен быть Vector")
 
         if index < -self.rows_quantity or index >= self.rows_quantity:
             raise IndexError(f"Заданный индекс вектора-строки index: {index}, должен быть в диапазоне: "
                              f"[{-self.rows_quantity}, {self.rows_quantity - 1}]")
+
+        # Проверка размерности вектора row
+        if row.dimension != self.columns_quantity:
+            raise ValueError(f"Размерность: {row.dimension}, должна быть равна "
+                             f"количеству столбцов в матрице: {self.columns_quantity}")
 
         self.__rows[index] = Vector(row)
 
