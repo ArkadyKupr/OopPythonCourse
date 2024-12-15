@@ -22,7 +22,13 @@ class Vector:
             raise TypeError(f"Объект vector: {vector}, не является объектом класса Vector. "
                             f"Сейчас тип vector: {type(vector).__name__}")
 
-        self.__components = [component for component in vector]
+        dimension = len(vector)
+        vector_list = []
+
+        for i in range(dimension):
+            vector_list.append(vector[i])
+
+        self.__components = vector_list
 
     # 1. с) заполнение вектора значениями из списка чисел
     @dispatch(list)
