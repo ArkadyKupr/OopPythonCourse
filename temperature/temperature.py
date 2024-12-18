@@ -57,17 +57,21 @@ def button_handler(message):
 
 # создаем окно
 root = Tk()
-f_top = Frame(root)
-f_center = Frame(root)
-f_bottom = Frame(root)
-f_ground = Frame(root)
-f_ground_1 = Frame(root)
 
-f_top.pack()
-f_center.pack()
-f_bottom.pack()
-f_ground.pack()
-f_ground_1.pack()
+# 6 горизонтальных рамок, расположенных сверху вниз
+frame_1 = Frame(root)
+frame_2 = Frame(root)
+frame_3 = Frame(root)
+frame_4 = Frame(root)
+frame_5 = Frame(root)
+frame_6 = Frame(root)
+
+frame_1.pack()
+frame_2.pack()
+frame_3.pack()
+frame_4.pack()
+frame_5.pack()
+frame_6.pack()
 
 # заголовок окна
 root.title("Перевод температуры")
@@ -78,80 +82,53 @@ root.resizable(True, True)
 root.minsize(300, 200)
 root.maxsize(1200, 800)
 
-# добавка переменной виджета
+# создание двух переменных:
+# message - переменная, которой присвоится введенное значение температуры
+# result_message - переменная, которой присвоится результат перевода переменной message
 message = StringVar()
-
 result_message = StringVar()
 
-message.get()
-
-entry = ttk.Entry(f_top, textvariable=message)
+# добавка  виджета Entry и привязка к нему переменной message
+entry = ttk.Entry(frame_2, textvariable=message)
 entry.pack(side="left", fill=X, padx=20, pady=20)
 
-text = message.get()
-
-button = ttk.Button(f_center, text="Ok", command=entry.get())
-button.pack(side=LEFT)
+# добавка  "кнопки перевода температуры" и привязка к нему события:
+# при нажатии этой кнопки получаем значение result_message
+button = ttk.Button(frame_6, text="Ok")
+button.pack()
 
 button.bind("<Button>", lambda event: result_message.set(button_handler(message.get())))
 
-# Было: button.bind("<Button>", lambda event: message.set(button_handler(message.get())))
+# добавка виджета Label, в котором выводится полученное значение переменной result_message
+result_label = Label(frame_4, text="0", width=23)
+result_label.pack(side=LEFT)
 
-result_label = Label(f_top, text="0")
-result_label.pack(side=RIGHT)
 
-
+# привязка к кнопке "кнопка перевода температуры" отображения измененного значения result_message
 def show_message():
-    result_label["text"] = from_message.get() + " " + result_message.get() + " " + to_message.get()
+    result_label["text"] = result_message.get()
 
 
 button.bind("<Button>", lambda event: show_message(), add="+")
 
+# Надпись "FROM" над "кнопкой для выбора между C, K или F" для вводимой температуры
+from_label = Label(frame_1, text="FROM")
+from_label.pack(side=RIGHT)
 
-# Блок "FROM"
-from_temperatures = ["C", "K", "F"]
-from_temperatures_var = StringVar(value=from_temperatures)
+# Надпись "TO" над "кнопкой для выбора между C, K или F" для выводимой температуры
+to_label = Label(frame_3, text="TO")
+to_label.pack(side=RIGHT)
 
-from_lbox = Listbox(f_bottom, width=15, height=8, listvariable=from_temperatures_var)
-from_lbox.pack(side=LEFT)
+# Создание переменных в которые записывается значения C, K или F для записи в них выбранных размерностей
+# вводимой и выводимой температуры
+from_message = StringVar()
+to_message = StringVar()
 
-
-# выбор значения температуры из "FROM"
-def get_selected_from_value():
-    # переменная для индекса выбранного значения
-    index = from_lbox.curselection()
-    from_message.set(index)
-    print(index[0])
-    return index[0]
-
-
-# Надпись над кнопкою для перевода "FROM"
-from_label = Label(f_ground, text="FROM              ")
-from_label.pack(side=LEFT)
-
-
-# Блок "TO"
-to_temperatures = ["C", "K", "F"]
-to_temperatures_var = StringVar(value=to_temperatures)
-
-to_lbox = Listbox(f_bottom, width=15, height=8, listvariable=to_temperatures_var)
-to_lbox.pack(side=LEFT)
-
-
-# выбор значения температуры из "TO"
-def get_selected_to_value():
-    # переменная для индекса выбранного значения
-    index = to_lbox.curselection()
-    to_message.set(index)
-    print(index[0])
-    return index[0]
-
-
-to_label = Label(f_ground, text="      TO")
-to_label.pack(side=LEFT)
-
-from_message = StringVar(value=from_temperatures[0])
-to_message = StringVar(value=to_temperatures[0])
+# Создание кнопки для выбора размерности вводимой температуры
+# Значение переменной from_message используется: 1) для изменения надписи на этой кнопке;
+# 2) для выбора правильной функции перевода температуры
+from_submit_button = ttk.Button(frame_2, text="CHOOSE")
+from_submit_button.bind("<Button>", lambda event: from_message.set(str(next(from_iterator))))
 
 
 # Изменение надписи на кнопке from_submit_button
@@ -159,11 +136,14 @@ def from_submit_button_handler():
     from_submit_button["text"] = from_message.get()
 
 
-# Кнопка from_submit_button для подключения к "FROM"
-from_submit_button = ttk.Button(f_ground_1, text="C")
-from_submit_button.bind("<Button>", lambda event: from_message.set(str(next(iterator))))
 from_submit_button.bind("<Button>", lambda event: from_submit_button_handler(), add="+")
 from_submit_button.pack(side=LEFT)
+
+# Создание кнопки для выбора размерности выводимой температуры
+# Значение переменной to_message используется: 1) для изменения надписи на этой кнопке;
+# 2) для выбора правильной функции перевода температуры
+to_submit_button = ttk.Button(frame_4, text="CHOOSE")
+to_submit_button.bind("<Button>", lambda event: to_message.set(str(next(to_iterator))))
 
 
 # Изменение надписи на кнопке to_submit_button
@@ -171,22 +151,22 @@ def to_submit_button_handler():
     to_submit_button["text"] = to_message.get()
 
 
-# Кнопка to_submit_button для подключения к "TO"
-to_submit_button = ttk.Button(f_ground_1, text="C")
-to_submit_button.bind("<Button>", lambda event: to_message.set(to_temperatures[get_selected_to_value()]))
 to_submit_button.bind("<Button>", lambda event: to_submit_button_handler(), add="+")
 to_submit_button.pack(side=LEFT)
 
 
-def fto():
-    for temperature in ["C", "K", "F"]:
-        yield temperature
+# Отступ над "кнопкой перевода температур"
+to_label = Label(frame_5, text=" ")
+to_label.pack()
 
 
-def ffrom():
-    for temperature in ["C", "K", "F"]:
-        yield str(temperature)
+def circular():
+    while True:
+        for temperature in ["C", "K", "F"]:
+            yield str(temperature)
 
-iterator = ffrom()
-# отображение температуры
+
+from_iterator = circular()
+to_iterator = circular()
+
 root.mainloop()
