@@ -134,7 +134,7 @@ class Matrix:
 
         # Проверка размерности вектора row
         if row.dimension != self.columns_quantity:
-            raise ValueError(f"Размерность: {row.dimension}, должна быть равна "
+            raise ValueError(f"Размерность вектора: {row.dimension}, должна быть равна "
                              f"количеству столбцов в матрице: {self.columns_quantity}")
 
         self.__rows[index] = Vector(row)
@@ -144,8 +144,8 @@ class Matrix:
         if not isinstance(scalar, (int, float)):
             raise TypeError(f"Тип scalar: {scalar}, должен быть int иди float")
 
-        for row_vector in self:
-            row_vector *= scalar
+        for row in self:
+            row *= scalar
 
         return self
 
