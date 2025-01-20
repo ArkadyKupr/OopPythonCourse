@@ -13,7 +13,7 @@ class HashTable(Collection):
         if capacity <= 0:
             raise ValueError(f"Размер массива хэш-таблицы capacity: {capacity}, должен быть > 0")
 
-        self.__items = [None] * capacity
+        self.__lists = [None] * capacity
 
         # Атрибут, который хранит количество элементов в хэш-таблице
         self.__size = 0
@@ -23,20 +23,20 @@ class HashTable(Collection):
         return self.__size
 
     # Метод для вычисления индекса:
-    def __get_index(self, item):
+    def __get_index(self, hash_list):
         # Вычисление hash-кода для элемента типа list
-        if not isinstance(item, Hashable):
-            raise TypeError(f"Тип объекта: {item}, не хешируемый")
+        if not isinstance(list, Hashable):
+            raise TypeError(f"Тип объекта: {hash_list}, не хешируемый")
 
-        return abs(hash(item) % len(self.__items))
+        return abs(hash(hash_list) % len(self.__lists))
 
     def insert_element(self, element):
         index = self.__get_index(element)
 
-        if self.__items[index] is None:
-            self.__items[index] = [element]
+        if self.__lists[index] is None:
+            self.__lists[index] = [element]
         else:
-            self.__items[index].append(element)
+            self.__lists[index].append(element)
 
         self.__size += 1
 
@@ -46,17 +46,17 @@ class HashTable(Collection):
 
         index = self.__get_index(element)
 
-        return element in self.__items[index]
+        return element in self.__lists[index]
 
     # Удаление элемента по значению. Если удалили, то выдает True, иначе - False
     def delete(self, element):
         index = self.__get_index(element)
 
-        if self.__items[index] is None:
+        if self.__lists[index] is None:
             return False
 
-        if element in self.__items[index]:
-            self.__items[index].remove(element)
+        if element in self.__lists[index]:
+            self.__lists[index].remove(element)
             self.__size -= 1
 
             return True
@@ -64,17 +64,17 @@ class HashTable(Collection):
         return False
 
     def __iter__(self):
-        for item in self.__items:
-            if item is None:
+        for hash_list in self.__lists:
+            if hash_list is None:
                 continue
             else:
-                for element in item:
+                for element in hash_list:
                     if element is not None:
                         yield element
                     else:
                         yield None
 
     def __repr__(self):
-        strings_list = map(str, self.__items)
+        strings_list = map(str, self.__lists)
 
         return "[" + ", ".join(strings_list) + "]"
