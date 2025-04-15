@@ -23,15 +23,15 @@ class HashTable(Collection):
         return self.__size
 
     # Метод для вычисления индекса:
-    def __get_index(self, hash_list):
+    def _get_index(self, hash_list):
         # Вычисление hash-кода для элемента типа list
-        if not isinstance(list, Hashable):
+        if not isinstance(hash_list, Hashable):
             raise TypeError(f"Тип объекта: {hash_list}, не хешируемый")
 
         return abs(hash(hash_list) % len(self.__lists))
 
     def insert_element(self, element):
-        index = self.__get_index(element)
+        index = self._get_index(element)
 
         if self.__lists[index] is None:
             self.__lists[index] = [element]
@@ -44,13 +44,14 @@ class HashTable(Collection):
         if element is None:
             return ValueError("Передаваемый элемент не должен быть None")
 
-        index = self.__get_index(element)
+        index = self._get_index(element)
 
-        return element in self.__lists[index]
+        for element in self.__lists[index]:
+            return element in self.__lists[index]
 
     # Удаление элемента по значению. Если удалили, то выдает True, иначе - False
     def delete(self, element):
-        index = self.__get_index(element)
+        index = self._get_index(element)
 
         if self.__lists[index] is None:
             return False
@@ -65,14 +66,20 @@ class HashTable(Collection):
 
     def __iter__(self):
         for hash_list in self.__lists:
-            if hash_list is None:
-                continue
+            if hash_list is not None:
+                if not isinstance(hash_list, Hashable):
+                    yield hash_list
+                else:
+                    for element in hash_list:
+                        if element is not None:
+                            yield element
+                        else:
+                            yield None
+
+
+
             else:
-                for element in hash_list:
-                    if element is not None:
-                        yield element
-                    else:
-                        yield None
+                yield None
 
     def __repr__(self):
         strings_list = map(str, self.__lists)
