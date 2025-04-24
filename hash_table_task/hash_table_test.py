@@ -8,7 +8,7 @@ print(user_hash_table)
 # Создание списка list - hashable type
 element_1 = "аргонавт"
 # Создание списка list - hashable type
-element_2 = tuple[1, 2, 4, 5]
+element_2 = tuple([1, 2, 4, 5])
 # Создание кортежа tuple - hashable type
 element_3 = (1, 2, 4, 5)
 # Создание словаря dict - unhashable type
@@ -16,6 +16,8 @@ element_4 = tuple({1: "A", 2: "B", 3: "C", 5: "D"})
 # Создание множества set - unhashable type
 element_5 = tuple({1, 2, 4, 5})
 
+user_hash_table.insert_element(element_1)
+user_hash_table.insert_element(element_1)
 user_hash_table.insert_element(element_1)
 user_hash_table.insert_element(element_2)
 user_hash_table.insert_element(element_3)
@@ -32,6 +34,8 @@ print(f"Элемент {element_5} содержится в хэш-таблице
 print(element_5 in user_hash_table)
 print(f"Элемент None содержится в хэш-таблице:")
 print(None in user_hash_table)
+print(f"Элемент [] содержится в хэш-таблице:")
+print([] in user_hash_table)
 print()
 
 print("Проверка __delitem__:")
@@ -55,7 +59,29 @@ print(len(user_hash_table))
 print()
 
 print("Проверка __iter__:")
+print(user_hash_table)
+print([] in user_hash_table)
+print()
+
+print(f"Удаление объекта []:")
+print(user_hash_table.delete([]))
+print(user_hash_table)
+print()
+
+print(f"Повторое даление объекта []:")
+print(user_hash_table.delete([]))
+print(user_hash_table)
+print()
+
 iterator = iter(user_hash_table)
+print(next(iterator))
+print(next(iterator))
+print(next(iterator))
+print(next(iterator))
+print(next(iterator))
+print(next(iterator))
+print(next(iterator))
+print(next(iterator))
 print(next(iterator))
 print(next(iterator))
 print(next(iterator))
