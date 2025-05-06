@@ -16,6 +16,11 @@ class ArrayList(MutableSequence):
 
         self.__items = [None] * size
         self.__count = 0
+        self.__capacity = size
+
+    @property
+    def capacity(self):
+        return self.__capacity
 
     # Для варианта со slice в __getitem__, где нужно выдавать экземпляр своего списка вместо стандартного
     # В списке должны допускаться любые типы элементов
@@ -27,12 +32,13 @@ class ArrayList(MutableSequence):
 
         self.__count = len(items)
         self.__items = items.copy()
+        self.__capacity = len(items)
 
     def __len__(self):
         return self.__count
 
     # Проверка, что переданный индекс item-а в списке имеет тип int
-    # Проверка, что переданный индекс item-а не выходит за диапазон допустимых значений списка
+    # Проверка, что переданный индекс item-а не выходит за диапазон допустимых значений списка, именно за self.__count
     def __check_item_index(self, index):
         if not isinstance(index, int):
             raise TypeError(f"Тип index: {index}, должен быть int. Сейчас тип: {type(index.__name__)}")
@@ -51,7 +57,7 @@ class ArrayList(MutableSequence):
 
         # Поддержка отрицательных индексов
         if key < 0:
-            key += len(self.__items)
+            key += self.__count
 
         return self.__items[key]
 
@@ -60,13 +66,13 @@ class ArrayList(MutableSequence):
 
         # Поддержка отрицательных индексов
         if index < 0:
-            index += len(self.__items)
+            index += self.__count
 
         self.__items[index] = item
 
     def append(self, item):
         # В списке должны допускаться любые типы элементов
-        if self.__count >= len(self.__items):
+        if self.__count >= self.__capacity:
             self.__increase_capacity()
 
         self.__items[self.__count] = item
@@ -78,8 +84,12 @@ class ArrayList(MutableSequence):
         # Увеличение длины пустого массива
         if len(self.__items) == 0:
             self.__items = [None] * 10
+
+            self.__capacity = 10
         else:
-            self.__items += [None] * len(self.__items)
+            self.__items += [None] * self.__count
+
+            self.__capacity += self.__count
 
     # Метод гарантирует, что вместимость списка будет >= указанного числа
     def ensure_capacity(self, capacity):
@@ -89,10 +99,14 @@ class ArrayList(MutableSequence):
         if len(self.__items) < capacity:
             self.__items += [None] * (capacity - len(self.__items))
 
+            self.__capacity = capacity
+
     # Метод урезает внутренний массив до размера списка. Полезно, если в списке было много элементов, а стало мало
     def trim_to_size(self):
-        if self.__count < len(self.__items):
+        if self.__count < self.__capacity:
             self.__items = self.__items[0: self.__count]
+
+            self.__capacity = len(self.__items)
 
     # Функция, которая возвращает True, если по типу можно проитерироваться, иначе - False
     @staticmethod
@@ -104,10 +118,7 @@ class ArrayList(MutableSequence):
             return False
 
     def copy(self):
-        copied_list = []
-
-        for item in self.__items:
-            copied_list.append(item)
+        copied_list = self.__items[:]
 
         return ArrayList(copied_list)
 
@@ -116,7 +127,7 @@ class ArrayList(MutableSequence):
 
         # Поддержка отрицательных индексов
         if index < 0:
-            index += len(self.__items)
+            index += self.__count
 
         for i in range(index, self.__count - 1):
             self.__items[i] = self.__items[i + 1]
@@ -136,9 +147,9 @@ class ArrayList(MutableSequence):
 
         # Поддержка отрицательных индексов
         if index < 0:
-            index += len(self.__items)
+            index += self.__count
 
-        if index == len(self.__items):
+        if index == self.__count:
             self.__increase_capacity()
 
         for i in range(self.__count, index, -1):
@@ -149,17 +160,22 @@ class ArrayList(MutableSequence):
         self.__count += 1
 
     def __iter__(self):
-        for i in range(len(self.__items)):
+        for i in range(self.__count):
             yield self.__items[i]
 
     def __repr__(self):
-        items_list = map(lambda x: str(x), self.__items[0: len(self.__items)])
+        items_list = map(lambda x: str(x), self.__items[0: self.__capacity])
 
         return "[" + ", ".join(items_list) + "]"
 
     def __eq__(self, other):
         if not isinstance(other, ArrayList):
             raise TypeError(f"Объект other: {other}, не является объектом класса ArrayList")
+
+        # Сравнение размеров списков:
+        if len(self.__items) != len(other.__items):
+            raise ValueError(f"Длина списка: {self.__items}, должна быть равна длине списка: {other.__items}. "
+                             f"Сейчас длины списков: {len(self.__items)} и {len(other.__items)}.")
 
         for i in range(self.__count):
             if self.__items[i] != other.__items[i]:
@@ -168,7 +184,7 @@ class ArrayList(MutableSequence):
         return True
 
     def __hash__(self):
-        return hash(tuple(self.__items))
+        return hash((tuple(self.__items), self.__count, self.__capacity))
 
     def reverse(self):
         array_list_middle_index = self.__count // 2
@@ -177,3 +193,27 @@ class ArrayList(MutableSequence):
             copy = self.__items[i]
             self.__items[i] = self.__items[self.__count - 1 - i]
             self.__items[self.__count - 1 - i] = copy
+
+    def clear(self):
+        del self.__items[:]
+        self.__count = 0
+
+        self.__capacity = 0
+
+        return self.__items
+
+    def extend(self, components):
+        if not self.__is_iterable(components):
+            raise TypeError(f"Тип components: {components}, неитерируемый. "
+                            f"Сейчас тип components: {type(components).__name__}.")
+
+        self.ensure_capacity(self.__capacity + len(components))
+
+        item_number = self.__count
+
+        for component in components:
+            self.__items[item_number] = component
+            item_number += 1
+
+        self.__count += len(components)
+        self.__capacity += len(components)
