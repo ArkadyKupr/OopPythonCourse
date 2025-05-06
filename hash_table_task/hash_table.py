@@ -23,14 +23,10 @@ class HashTable(Collection):
         return self.__size
 
     # Метод для вычисления индекса:
-    def __get_index(self, hash_list):
-        # Вычисление hash-кода для элемента типа list
-        """if not isinstance(hash_list, Hashable):
-            raise TypeError(f"Тип объекта: {hash_list}, не хешируемый")"""
+    def __get_index(self, element):
+        return abs(hash(element) % len(self.__lists))
 
-        return abs(hash(hash_list) % len(self.__lists))
-
-    def insert_element(self, element):
+    def add_element(self, element):
         index = self.__get_index(element)
 
         if self.__lists[index] is None:
@@ -40,64 +36,37 @@ class HashTable(Collection):
 
         self.__size += 1
 
-    def __contains__(self, user_element):
-        # Проверка,что пустой список содержится в хэш-таблице:
-        if isinstance(user_element, list) and len(user_element) == 0:
-            for element in self.__lists:
-                if isinstance(element, list) and len(element) == 0:
-                    return True
+    def __contains__(self, element):
+        index = self.__get_index(element)
 
+        # Проверка,что запрашиваемый список в хэш-таблице не None, иначе код упадёт
+        if self.__lists[index] is None:
             return False
 
-        # Проверка,что None содержится в хэш-таблице:
-        if user_element is None:
-            for element in self.__lists:
-                if element is None:
-                    return True
-
-        index = self.__get_index(user_element)
-
-        for user_element in self.__lists[index]:
-            return user_element in self.__lists[index]
+        for list_element in self.__lists[index]:
+            if element == list_element:
+                return True
 
     # Удаление элемента по значению. Если удалили, то выдает True, иначе - False
-    def delete(self, user_element):
-        # Удаление пустого списка в хэш-таблице:
-        if isinstance(user_element, list) and len(user_element) == 0:
-            element_deleted = False
-
-            for i, element in enumerate(self.__lists):
-                if isinstance(element, list) and len(element) == 0:
-                    self.__lists[i] = None
-                    element_deleted = True
-
-                if i == self.__size - 1 and element_deleted:
-                    return True
-
-            return False
-
-        index = self.__get_index(user_element)
+    def delete(self, element):
+        index = self.__get_index(element)
 
         if self.__lists[index] is None:
             return False
 
-        if user_element in self.__lists[index]:
-            self.__lists[index].remove(user_element)
+        try:
+            self.__lists[index].remove(element)
             self.__size -= 1
-            return True
 
-        return False
+            return True
+        except ValueError:
+            return False
 
     def __iter__(self):
-        for hash_list in self.__lists:
-            if hash_list is not None:
-                if isinstance(hash_list, list) and len(hash_list) == 0:
-                    yield None
-
-                for element in hash_list:
+        for list_element in self.__lists:
+            if list_element is not None:
+                for element in list_element:
                     yield element
-            else:
-                yield None
 
     def __repr__(self):
         strings_list = map(str, self.__lists)
