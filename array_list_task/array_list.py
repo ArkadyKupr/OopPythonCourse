@@ -4,23 +4,19 @@ from multipledispatch import dispatch
 
 class ArrayList(MutableSequence):
     @dispatch(int)
-    def __init__(self, size=None):
-        if size is None:
-            size = 10
+    def __init__(self, capacity=None):
+        if capacity is None:
+            capacity = 10
         else:
-            if not isinstance(size, int):
-                raise TypeError(f"Тип size: {size}, должен быть int")
+            if not isinstance(capacity, int):
+                raise TypeError(f"Тип capacity: {capacity}, должен быть int. "
+                                f"Сейчас тип: {type(capacity).__name__}")
 
-            if size < 0:
-                raise ValueError(f"Вместимость size должна быть >= 0. Передано значение size: {size}")
+            if capacity < 0:
+                raise ValueError(f"Вместимость capacity должна быть >= 0. Передано значение capacity: {capacity}")
 
-        self.__items = [None] * size
+        self.__items = [None] * capacity
         self.__count = 0
-        self.__capacity = size
-
-    @property
-    def capacity(self):
-        return self.__capacity
 
     # Для варианта со slice в __getitem__, где нужно выдавать экземпляр своего списка вместо стандартного
     # В списке должны допускаться любые типы элементов
@@ -30,18 +26,21 @@ class ArrayList(MutableSequence):
             raise TypeError(f"Объект items: {items}, не является списком. "
                             f"Сейчас тип items: {type(items).__name__}")
 
-        self.__count = len(items)
         self.__items = items.copy()
-        self.__capacity = len(items)
+        self.__count = len(items)
 
     def __len__(self):
+        return len(self.__items)
+
+    @property
+    def items_count(self):
         return self.__count
 
     # Проверка, что переданный индекс item-а в списке имеет тип int
     # Проверка, что переданный индекс item-а не выходит за диапазон допустимых значений списка, именно за self.__count
     def __check_item_index(self, index):
         if not isinstance(index, int):
-            raise TypeError(f"Тип index: {index}, должен быть int. Сейчас тип: {type(index.__name__)}")
+            raise TypeError(f"Тип index: {index}, должен быть int. Сейчас тип: {type(index).__name__}")
 
         if index < -self.__count or index >= self.__count:
             raise ValueError(f"Индекс index: {index}, должен лежать в диапазоне "
@@ -72,7 +71,7 @@ class ArrayList(MutableSequence):
 
     def append(self, item):
         # В списке должны допускаться любые типы элементов
-        if self.__count >= self.__capacity:
+        if self.__count >= len(self.__items):
             self.__increase_capacity()
 
         self.__items[self.__count] = item
@@ -84,29 +83,21 @@ class ArrayList(MutableSequence):
         # Увеличение длины пустого массива
         if len(self.__items) == 0:
             self.__items = [None] * 10
-
-            self.__capacity = 10
         else:
             self.__items += [None] * self.__count
-
-            self.__capacity += self.__count
 
     # Метод гарантирует, что вместимость списка будет >= указанного числа
     def ensure_capacity(self, capacity):
         if not isinstance(capacity, int):
-            raise TypeError(f"Тип capacity: {capacity}, должен быть int")
+            raise TypeError(f"Тип capacity: {capacity}, должен быть int. Сейчас тип: {type(capacity).__name__}")
 
         if len(self.__items) < capacity:
             self.__items += [None] * (capacity - len(self.__items))
 
-            self.__capacity = capacity
-
     # Метод урезает внутренний массив до размера списка. Полезно, если в списке было много элементов, а стало мало
     def trim_to_size(self):
-        if self.__count < self.__capacity:
+        if self.__count < len(self.__items):
             self.__items = self.__items[0: self.__count]
-
-            self.__capacity = len(self.__items)
 
     # Функция, которая возвращает True, если по типу можно проитерироваться, иначе - False
     @staticmethod
@@ -118,7 +109,7 @@ class ArrayList(MutableSequence):
             return False
 
     def copy(self):
-        copied_list = self.__items[:]
+        copied_list = self.__items[0:self.__count]
 
         return ArrayList(copied_list)
 
@@ -138,7 +129,7 @@ class ArrayList(MutableSequence):
 
     def insert(self, index, item):
         if not isinstance(index, int):
-            raise TypeError(f"Тип index: {index}, не является int")
+            raise TypeError(f"Тип index: {index}, не является int. Сейчас тип: {type(index).__name__}")
 
         # insert допускает вставку в конец списка, поэтому index варьируется до self.__count включительно
         if index < -self.__count or index > self.__count:
@@ -164,18 +155,20 @@ class ArrayList(MutableSequence):
             yield self.__items[i]
 
     def __repr__(self):
-        items_list = map(lambda x: str(x), self.__items[0: self.__capacity])
+        items_list = map(lambda x: str(x), self.__items[0:self.__count])
 
         return "[" + ", ".join(items_list) + "]"
 
     def __eq__(self, other):
         if not isinstance(other, ArrayList):
-            raise TypeError(f"Объект other: {other}, не является объектом класса ArrayList")
+            raise TypeError(f"Объект other: {other}, не является объектом класса ArrayList."
+                            f"Сейчас тип: {type(other).__name__}")
 
         # Сравнение размеров списков:
-        if len(self.__items) != len(other.__items):
-            raise ValueError(f"Длина списка: {self.__items}, должна быть равна длине списка: {other.__items}. "
-                             f"Сейчас длины списков: {len(self.__items)} и {len(other.__items)}.")
+        if self.__count != other.__count:
+            raise ValueError(f"Количество элеметов в списке: {self.__items}, "
+                             f"должно быть равно количеству элементов в списке: {other.__items}. "
+                             f"Сейчас количество элементов в списках: {self.__count} и {other.__count}.")
 
         for i in range(self.__count):
             if self.__items[i] != other.__items[i]:
@@ -184,36 +177,31 @@ class ArrayList(MutableSequence):
         return True
 
     def __hash__(self):
-        return hash((tuple(self.__items), self.__count, self.__capacity))
+        return hash((tuple(self.__items[0:self.__count])))
 
     def reverse(self):
         array_list_middle_index = self.__count // 2
 
         for i in range(array_list_middle_index):
-            copy = self.__items[i]
+            temp = self.__items[i]
             self.__items[i] = self.__items[self.__count - 1 - i]
-            self.__items[self.__count - 1 - i] = copy
+            self.__items[self.__count - 1 - i] = temp
 
     def clear(self):
-        del self.__items[:]
+        self.__items.clear()
         self.__count = 0
-
-        self.__capacity = 0
-
-        return self.__items
 
     def extend(self, components):
         if not self.__is_iterable(components):
             raise TypeError(f"Тип components: {components}, неитерируемый. "
                             f"Сейчас тип components: {type(components).__name__}.")
 
-        self.ensure_capacity(self.__capacity + len(components))
+        self.ensure_capacity(self.__count + len(components))
 
-        item_number = self.__count
+        i = self.__count
 
         for component in components:
-            self.__items[item_number] = component
-            item_number += 1
+            self.__items[i] = component
+            i += 1
 
         self.__count += len(components)
-        self.__capacity += len(components)
