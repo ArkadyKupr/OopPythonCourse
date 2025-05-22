@@ -604,7 +604,7 @@ class Minesweeper(tkinter.Tk):
         # создание model
         model = Model()
 
-        # создание view
+        # создание view_and_controller
         view = View()
         view.pack()
 
